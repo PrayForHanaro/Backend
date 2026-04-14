@@ -2,6 +2,8 @@ package com.hanaro.orgservice.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,22 @@ public class ReligiousOrg {
 	@Column(nullable = false)
 	private String address;
 
+	/**
+	 * 누적 헌금 총액
+	 * 성도들이 이 교회에 헌금한 전체 누적 금액
+	 * 헌금 등록 시 offering-service → org-service API 호출로 업데이트
+	 */
+	@Column(nullable = false)
+	private BigDecimal totalOfferingAmount;
+
+	/**
+	 * 누적 포인트 총액
+	 * 이 교회 성도들이 헌금으로 적립한 포인트 합산
+	 * 포인트 적립 시 업데이트
+	 */
+	@Column(nullable = false)
+	private BigDecimal totalPointAmount;
+
 	/** 대표 전화번호 */
 	@Column(length = 20)
 	private String phone;
@@ -75,6 +93,8 @@ public class ReligiousOrg {
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
 		this.memberCount = 0;
+		this.totalOfferingAmount = BigDecimal.ZERO;
+		this.totalPointAmount = BigDecimal.ZERO;
 	}
 
 	/** 성도 수 증가 (회원가입 시) */
@@ -102,5 +122,15 @@ public class ReligiousOrg {
 	/** 주소 변경 */
 	public void updateAddress(String address) {
 		this.address = address;
+	}
+
+	/** 헌금 총액 누적 */
+	public void addOfferingAmount(BigDecimal amount) {
+		this.totalOfferingAmount = this.totalOfferingAmount.add(amount);
+	}
+
+	/** 포인트 총액 누적 */
+	public void addPointAmount(BigDecimal amount) {
+		this.totalPointAmount = this.totalPointAmount.add(amount);
 	}
 }

@@ -6,58 +6,40 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+//  gift:prayerSavings =  1:다 / 여기는 기도문 만
 /**
  * 기도 적금
  * - 기도 제목을 걸고 적금 납입
  * - D+N / 총 N일 형태로 진행 현황 표시
  * - 목표 금액 달성 여부 추적
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "PRAYER_SAVINGS")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class PrayerSavings {
+public class PrayerSavings extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long prayerSavingsId;
 
-	/** 적금 가입자 ID (user_db 참조, FK 없음) */
-	@Column(nullable = false)
-	private Long userId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "gift", referencedColumnName = "id",
+		columnDefinition = "int unsigned",
+		foreignKey = @ForeignKey(name = "fk_Prayer_Savings_Gift"))
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Gift gift;
 
-	/** 입금될 적금 계좌 ID (user_db 참조, FK 없음) */
-	@Column(nullable = false)
-	private Long toSavingsAccountId;
-
-	/** 기도 제목 (예: 홍길동 아들 100일 기도) */
+	/** 기도문  */
 	@Column(nullable = false, length = 100)
-	private String prayerTitle;
-
-	/** 기도 대상 (예: 홍길동) */
-	@Column(length = 50)
-	private String prayerTarget;
-
-	/** 목표 금액 */
-	@Column(nullable = false)
-	private BigDecimal targetAmount;
-
-	/** 월 납입액 */
-	@Column(nullable = false)
-	private BigDecimal monthlyAmount;
-
-	/** 현재 납입 누적액 */
-	@Column(nullable = false)
-	private BigDecimal currentAmount;
+	private String prayerContent;
 
 	/** 시작일 */
 	@Column(nullable = false)
 	private LocalDate startDate;
-
-	/** 종료일 (null이면 무기한) */
-	private LocalDate endDate;
 
 	/** D+N 현재 경과일수 */
 	@Column(nullable = false)
@@ -81,31 +63,5 @@ public class PrayerSavings {
 		this.isActive = true;
 		this.currentAmount = BigDecimal.ZERO;
 		this.dDay = 0;
-	}
-
-	/** 납입액 추가 + D+N 증가 */
-	public void addPayment(BigDecimal amount) {
-		this.currentAmount = this.currentAmount.add(amount);
-		this.dDay++;
-	}
-
-	/** 목표 달성 여부 */
-	public boolean isCompleted() {
-		return this.currentAmount.compareTo(this.targetAmount) >= 0
-			|| this.dDay >= this.totalDays;
-	}
-
-	/** 진행률 (%) */
-	public int getProgressRate() {
-		if (this.targetAmount.compareTo(BigDecimal.ZERO) == 0) return 0;
-		return this.currentAmount
-			.multiply(BigDecimal.valueOf(100))
-			.divide(this.targetAmount, 0, java.math.RoundingMode.DOWN)
-			.intValue();
-	}
-
-	/** 적금 비활성화 */
-	public void deactivate() {
-		this.isActive = false;
 	}
 }

@@ -41,16 +41,3 @@ CREATE TABLE IF NOT EXISTS PENSION (
     created_at              DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (pension_id)
     );
-
--- DONATION 수정 (user_id, offering_amount, donation_rate 추가)
-CREATE TABLE IF NOT EXISTS DONATION (
-    donation_id        BIGINT        NOT NULL AUTO_INCREMENT,
-    org_id             BIGINT        NOT NULL,
-    user_id            BIGINT        NOT NULL,
-    offering_amount    DECIMAL(15,2) NOT NULL,
-    donation_rate      DECIMAL(5,2)  NOT NULL,
-    amount             DECIMAL(15,2) NOT NULL,
-    hana_pension_count INT           NOT NULL DEFAULT 0,
-    donated_at         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (donation_id)
-    );

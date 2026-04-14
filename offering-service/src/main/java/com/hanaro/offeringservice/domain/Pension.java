@@ -41,12 +41,13 @@ public class Pension {
 	 * 국민연금 / 퇴직연금 / 개인연금
 	 */
 	@Column(nullable = false, length = 20)
-	private String pensionType;
+	@Enumerated(EnumType.STRING)
+	private PensionType pensionType;
 
 	/**
 	 * 하나은행 여부
-	 * true = 하나은행 → donation_rate 계산에 포함
-	 * false = 타행 → donation_rate 계산 제외
+	 * true = 하나은행 → 포인트 이율 계산에 포함
+	 * false = 타행 → 포인트 이율 계산 제외
 	 */
 	@Column(nullable = false)
 	private boolean isHana;

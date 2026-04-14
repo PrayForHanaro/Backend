@@ -13,13 +13,14 @@ import java.util.List;
  * - default_account_id는 순환참조로 인해 후처리
  * - donation_rate: 하나은행 연금 갯수에 비례 (1개=1%)
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "USER")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class User {
+public class User extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +34,7 @@ public class User {
 	@Column(nullable = false)
 	private Long districtId;
 
-	/** 성도 이름 */
+	/** 이름 */
 	@Column(nullable = false, length = 50)
 	private String name;
 
@@ -65,16 +66,12 @@ public class User {
 	private LocalDateTime lastCheckinAt;
 
 	/**
-	 * 헌금 기여율 (하나은행 기부금 비율)
+	 * 헌금 기여율
 	 * 하나은행 연금 1개당 1% 증가
 	 * 예: 연금 2개 = 2.00%
 	 */
 	@Column(nullable = false)
 	private Double donationRate;
-
-	/** 생성일시 */
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
 
 	// 같은 DB → 양방향 관계 정상 사용
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -91,7 +88,6 @@ public class User {
 
 	@PrePersist
 	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
 		this.donationRate = 0.0;
 		this.role = "일반";
 	}

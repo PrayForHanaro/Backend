@@ -11,13 +11,15 @@ import java.time.LocalDateTime;
  * - 기도말씀 함께 전송 (선택)
  * - 카카오톡 알림 발송
  */
+
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "TRANSFER")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class Transfer {
+public class Transfer extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,13 +45,8 @@ public class Transfer {
 	@Column(nullable = false)
 	private boolean kakaoSent;
 
-	/** 생성일시 */
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
 	@PrePersist
 	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
 		this.kakaoSent = false;
 	}
 

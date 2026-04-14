@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class Gift {
+public class Gift extends  BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class Gift {
 	private Long senderId;
 
 	/** 받는 사람 ID (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(nullable = true) /** 가입하지 않은 사용자에게 보낼 경우 null 처리 */
 	private Long receiverId;
 
 	/** 출금 계좌 ID - 나의 대표 헌금계좌 (user_db 참조, FK 없음) */
@@ -49,18 +49,21 @@ public class Gift {
 	@Column(nullable = false)
 	private boolean isActive;
 
-	/** 생성일시 */
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
+	/** 이 시점까지의 누적 송금 총액 */
+	@Column(nullable = false)
+	private BigDecimal cumulativeTotal;
 
 	// 같은 DB → 양방향 관계 정상 사용
 	@OneToMany(mappedBy = "gift", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<GiftLog> logs = new ArrayList<>();
 
+	@OneToMany(mappedBy = "gift", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	private List<PrayerSavings> prayerSavings = new ArrayList<>();
+
 	@PrePersist
 	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
 		this.isActive = true;
 	}
 

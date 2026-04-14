@@ -10,14 +10,17 @@ import java.time.LocalDateTime;
  * - 미클릭 시 미체크인 기간 증가
  * - 일정 기간 미접속 시 구역원들에게 안부묻기 버튼 노출
  */
+
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "CHECKIN")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class Checkin {
+public class Checkin extends BaseEntity {
 
+	// 살아있슈를 빼서 체크인 자체를 빼도 될 듯 ?
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long checkinId;

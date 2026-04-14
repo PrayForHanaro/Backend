@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS RELIGIOUS_ORG (
     representative_name VARCHAR(50)  NULL,
     registration_number VARCHAR(20)  NULL,
     member_count        INT          NOT NULL DEFAULT 0,
+    total_offering_amount DECIMAL(15,2)  NOT NULL DEFAULT 0,
+    total_point_amount    DECIMAL(15,2)  NOT NULL DEFAULT 0,
     created_at          DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (org_id)
     );

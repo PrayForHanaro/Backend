@@ -16,13 +16,15 @@ import lombok.*;
  * SAVINGS_JOIN       5000p  정기 적금 가입
  * SAVINGS_AUTO         10p  자동 이체 실행
  */
+
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "POINT_POLICY")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class PointPolicy {
+public class PointPolicy extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

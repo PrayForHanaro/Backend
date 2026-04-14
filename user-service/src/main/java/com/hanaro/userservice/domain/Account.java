@@ -10,13 +10,15 @@ import java.time.LocalDateTime;
  * - 기본 계좌 (is_default): 헌금/증여 출금 기본값
  * - 적금 계좌 (is_savings): 기도적금/증여 입금 대상
  */
+
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "ACCOUNT")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class Account {
+public class Account extends  BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +39,7 @@ public class Account {
 
 	/**
 	 * 하나은행 여부
-	 * true = 하나은행 → donation_rate 계산에 포함
+	 * true = 하나은행 → donation_rate 계산에 포함e => !!! bankname 으로 대신할까
 	 */
 	@Column(nullable = false)
 	private boolean isHana;
@@ -55,15 +57,6 @@ public class Account {
 	 */
 	@Column(nullable = false)
 	private boolean isSavings;
-
-	/** 생성일시 */
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-	}
 
 	/** 기본 계좌로 설정 */
 	public void setAsDefault() {
