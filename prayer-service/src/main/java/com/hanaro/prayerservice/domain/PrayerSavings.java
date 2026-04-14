@@ -6,12 +6,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 //  gift:prayerSavings =  1:다 / 여기는 기도문 만
 /**
- * 기도 적금
- * - 기도 제목을 걸고 적금 납입
- * - D+N / 총 N일 형태로 진행 현황 표시
- * - 목표 금액 달성 여부 추적
+ * 기도문 리스트
+ * 송금이랑 아예 별개로 관리됨
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -24,6 +25,7 @@ public class PrayerSavings extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(columnDefinition = "int unsigned")
 	private Long prayerSavingsId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -45,23 +47,9 @@ public class PrayerSavings extends BaseEntity {
 	@Column(nullable = false)
 	private int dDay;
 
-	/** 총 기도 목표일수 (기본 100일) */
-	@Column(nullable = false)
-	private int totalDays;
-
-	/** 활성화 여부 */
-	@Column(nullable = false)
-	private boolean isActive;
-
-	/** 생성일시 */
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
 
 	@PrePersist
 	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-		this.isActive = true;
-		this.currentAmount = BigDecimal.ZERO;
 		this.dDay = 0;
 	}
 }

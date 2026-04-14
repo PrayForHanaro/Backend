@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.apache.kafka.shaded.com.google.protobuf.Enum;
+
 /**
  * 정기 헌금 자동이체 설정
  * - 매달 지정일에 자동으로 헌금 처리
@@ -14,13 +16,14 @@ import java.time.LocalDateTime;
  * - 등록 시 포인트 지급 (OFFERING_RECURRING 500p)
  * - user_id, account_id, org_id 모두 다른 DB 참조 → FK 없음
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "RECURRING_OFFERING")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class RecurringOffering {
+public class RecurringOffering extends BaseEntity{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +46,8 @@ public class RecurringOffering {
 	 * 십일조 / 감사헌금 / 선교헌금 / 건축헌금 / 기타
 	 */
 	@Column(nullable = false, length = 20)
-	private String offeringType;
+	@Enumerated(EnumType.STRING)
+	private Enum offeringType;
 
 	/** 매달 자동이체 금액 */
 	@Column(nullable = false)
@@ -72,13 +76,8 @@ public class RecurringOffering {
 	@Column(nullable = false)
 	private boolean isActive;
 
-	/** 생성일시 */
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
 	@PrePersist
 	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
 		this.isActive = true;
 	}
 

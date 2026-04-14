@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
+ * ## 가입할 연금, 적금 등 상품 정보는 API로 불러온다 ##
+ *
  * 연금 정보
  * - 하나은행/타행 연금 구분해서 표시
  * - 하나은행 연금 등록 시 user.donation_rate 증가
@@ -14,13 +16,14 @@ import java.time.LocalDateTime;
  * - 월 예상 수령액 표시
  * - user_id, account_id 모두 다른 DB 참조 → FK 없음
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "PENSION")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class Pension {
+public class Pension extends BaseEntity{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,50 +48,28 @@ public class Pension {
 	private PensionType pensionType;
 
 	/**
-	 * 하나은행 여부
+	 * 하나은행 여부 : 출금계좌가 하나은행, 또는 하나은행 연금 상품
 	 * true = 하나은행 → 포인트 이율 계산에 포함
 	 * false = 타행 → 포인트 이율 계산 제외
 	 */
 	@Column(nullable = false)
-	private boolean isHana;
+	private boolean isHanaBank;
 
-	/** 현재 잔액 */
+
+	/** seed 데이터로 넣기 */
 	@Column(nullable = false)
-	private BigDecimal balance;
+	private BigDecimal totalContribution; // 총 납입액
 
-	/**
-	 * 월 예상 수령액
-	 * 사용자가 직접 입력 또는 외부 API 연동
-	 */
 	@Column(nullable = false)
-	private BigDecimal monthlyExpectedAmount;
+	private BigDecimal totalWithdrawal;   // 총 출금액
 
-	/** 연금 시작일 */
-	private LocalDate startDate;
+	@Column(nullable = false)
+	private BigDecimal profit;            // 운용 수익
 
-	/** 연금 종료 예정일 */
-	private LocalDate expectedEndDate;
+	@Column(nullable = false)
+	private BigDecimal returnRate;        // 수익률 (%)
 
 	/** 연금 기관명 (예: 하나은행, 국민연금공단) */
 	@Column(length = 100)
 	private String institutionName;
-
-	/** 생성일시 */
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-	}
-
-	/** 잔액 업데이트 */
-	public void updateBalance(BigDecimal balance) {
-		this.balance = balance;
-	}
-
-	/** 월 예상 수령액 업데이트 */
-	public void updateMonthlyExpectedAmount(BigDecimal amount) {
-		this.monthlyExpectedAmount = amount;
-	}
 }

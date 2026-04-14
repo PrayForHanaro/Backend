@@ -13,6 +13,7 @@ import java.util.List;
  * - 대상이 여러 명일 수 있음 (Gift 여러 개 생성)
  * - 메시지는 GiftLog에 날짜별 기록
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "GIFT")
 @Getter
@@ -20,9 +21,9 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class Gift extends  BaseEntity {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(columnDefinition = "int unsigned")
 	private Long giftId;
 
 	/** 보내는 사람 ID (user_db 참조, FK 없음) */
@@ -32,6 +33,9 @@ public class Gift extends  BaseEntity {
 	/** 받는 사람 ID (user_db 참조, FK 없음) */
 	@Column(nullable = true) /** 가입하지 않은 사용자에게 보낼 경우 null 처리 */
 	private Long receiverId;
+
+	@Enumerated(EnumType.STRING)
+	private GiftReceiverType giftReceiverType;
 
 	/** 출금 계좌 ID - 나의 대표 헌금계좌 (user_db 참조, FK 없음) */
 	@Column(nullable = false)
@@ -53,10 +57,14 @@ public class Gift extends  BaseEntity {
 	@Column(nullable = false)
 	private BigDecimal cumulativeTotal;
 
-	// 같은 DB → 양방향 관계 정상 사용
-	@OneToMany(mappedBy = "gift", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<GiftLog> logs = new ArrayList<>();
+	/** 적금 상품 이름 */
+	@Column(nullable = false)
+	private String savingsProductName;
+
+	/** 적금 상품 혜택률 */
+	@Column(nullable = false)
+	private BigDecimal interestRate;
+
 
 	@OneToMany(mappedBy = "gift", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default

@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "CALENDAR")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class Calendar {
+public class Calendar extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,25 +24,20 @@ public class Calendar {
 	@JoinColumn(name = "activity_id")
 	private Activity activity;  // 같은 DB → FK 정상 (nullable)
 
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 10)
-	private String calendarType;    // 개인/모임/교회
+	private CalendarType calendarType;    // 개인/교회
 
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 20)
 	private String title;
 
 	@Column(nullable = false)
-	private LocalDateTime startDate;
+	private LocalDateTime startDateTime;
 
-	private LocalDateTime endDate;
+	@Column(nullable = false)
+	private LocalDateTime endDateTime;
 
-	@Column(length = 500)
+	@Column(length = 100)
 	private String memo;
 
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-	}
 }

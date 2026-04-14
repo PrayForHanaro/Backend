@@ -6,13 +6,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 @Entity
 @Table(name = "ACTIVITY")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class Activity {
+public class Activity extends BaseEntity{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,16 +26,16 @@ public class Activity {
 	@Column(nullable = false)
 	private Long creatorId;     // FK 없음 (user_db)
 
-	@Column(nullable = false, length = 20)
-	private String activityCategory;  // 봉사모집/동행찾기/교회행사
+	@Enumerated(EnumType.STRING)
+	private ActivityCategory activityCategory;  // 봉사모집/동행찾기/교회행사
 
 	@Column(nullable = false, length = 10)
-	private String activityType;      // 일회성/정기
+	private ActivityType activityType;      // 일회성/정기
 
 	@Column(nullable = false, length = 100)
 	private String title;
 
-	@Column(columnDefinition = "TEXT")
+	@Column(columnDefinition = "TEXT", length = 1000)
 	private String description;
 
 	@Column(length = 255)
@@ -43,15 +45,21 @@ public class Activity {
 	private int maxMembers;
 
 	@Column(nullable = false)
-	private LocalDateTime startAt;
+	private LocalDateTime startAt; //정기, 비정기 모두 시간 설정 필수
 
-	private LocalDateTime endAt;
+	@Column(nullable = false)
+	private LocalDateTime endAt; //정기, 비정기 모두 시간 설정 필수
 
-	@Column(length = 10)
-	private String recurrence;      // 매일/매주/매월
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = true)
+	private RecurrenceType recurrence;      // 정기일 경우에만 선택. 매일/매주/매월
 
-	@Column(length = 20)
-	private String recurrenceDay;   // 요일 선택 시
+	@ElementCollection(fetch = FetchType.LAZY)
+	@Enumerated(EnumType.STRING)
+	private List<DayOfWeekType> recurrenceDays = new ArrayList<>(); //정기-매주 인 경우 설정
+
+	@Column(nullable = true)
+	private Integer recurrenceDayOfMonth; // 정기 - 매주인 경우
 
 	@Column(nullable = false)
 	private int pointAmount;
@@ -66,9 +74,4 @@ public class Activity {
 	@OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<ActivityApply> applies = new ArrayList<>();
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-	}
 }
