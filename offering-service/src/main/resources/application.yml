@@ -1,32 +1,46 @@
 server:
-  port: 8084
+  port: 8083
 
 spring:
+  profiles:
+    active: local
   application:
     name: offering-service
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://offering-db:3306/offering_db?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://offering-db:3306/offering_db
+    username: root
+    password: root
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
+        jdbc:
+          batch_size: 50
+          time_zone: Asia/Seoul
+        order_inserts: true
+        order_updates: true
         format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        use_sql_comments: true
   sql:
     init:
-      mode: always
-      schema-locations: classpath:sql/init.sql
+      mode: never
+
   kafka:
-    bootstrap-servers: ${KAFKA_SERVERS:kafka:9092}
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-  config:
-    import: classpath:secret.yml
+    bootstrap-servers: kafka:9092
+    consumer:
+      properties:
+        reconnect:
+          backoff:
+            ms: 1000
+            max:
+              ms: 10000
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 
 feign:
   circuitbreaker:
