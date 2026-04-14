@@ -24,10 +24,10 @@ public class Account extends  BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long accountId;
 
-	/** 계좌 소유자 (같은 DB → FK 정상 사용) */
+	/**  (같은 DB → FK 정상 사용) */
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+	@JoinColumn(name = "user_id", nullable = true) /** 자녀의 계좌일 경우 null 처리 */
+	private User user; //계좌 명의 주인
 
 	/** 은행명 (예: 하나은행, 국민은행) */
 	@Column(nullable = false, length = 50)
@@ -57,6 +57,7 @@ public class Account extends  BaseEntity {
 	 */
 	@Column(nullable = false)
 	private boolean isSavings;
+
 
 	/** 기본 계좌로 설정 */
 	public void setAsDefault() {

@@ -30,10 +30,6 @@ public class User extends BaseEntity {
 	@Column(nullable = false)
 	private Long orgId;
 
-	/** 소속 구역 ID (org_db 참조, FK 없음) */
-	@Column(nullable = false)
-	private Long districtId;
-
 	/** 이름 */
 	@Column(nullable = false, length = 50)
 	private String name;
@@ -43,31 +39,33 @@ public class User extends BaseEntity {
 	private LocalDate birthDate;
 
 	/** 전화번호 (로그인 ID로 사용) */
+	//형식 알아서 지정
 	@Column(nullable = false, unique = true, length = 20)
 	private String phone;
 
 	/**
 	 * 역할
-	 * 일반 / 집사 / 권사 / 목사 / 관리자
+	 * ex 일반 / 집사 / 권사 / 목사 / 관리자
 	 * 회원가입 시 교회 성도 리스트에서 자동 식별
 	 */
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 10)
-	private String role;
+	private UserRole role;
 
 	/**
 	 * 기본 출금 계좌 ID
 	 * 같은 DB이지만 순환참조로 인해 FK 후처리
 	 * (ACCOUNT 테이블 생성 후 ALTER TABLE로 FK 추가)
 	 */
-	@Column
-	private Long defaultAccountId;
 
-	/** 마지막 앱 진입 시간 (미접속일수 계산용) */
-	private LocalDateTime lastCheckinAt;
+	// User.java 내부 수정
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "default_account_id", nullable = true) // 초기 생성시엔 null일 수 있음
+	private Account defaultAccount; // 필드명을 ID가 아닌 객체로 변경
 
 	/**
 	 * 헌금 기여율
-	 * 하나은행 연금 1개당 1% 증가
+	 * 하나은행 연금 1개당 1% 증가 ???
 	 * 예: 연금 2개 = 2.00%
 	 */
 	@Column(nullable = false)
@@ -80,28 +78,19 @@ public class User extends BaseEntity {
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	private List<Checkin> checkins = new ArrayList<>();
-
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
 	private List<Point> points = new ArrayList<>();
 
 	@PrePersist
 	protected void onCreate() {
 		this.donationRate = 0.0;
-		this.role = "일반";
+		this.role = UserRole.일반사용자;
 	}
 
 	/** 기본 계좌 변경 */
-	public void updateDefaultAccount(Long accountId) {
-		this.defaultAccountId = accountId;
+	public void updateDefaultAccount(Account account) {
+		this.defaultAccount = account;
 	}
-
-	/** 마지막 체크인 갱신 */
-	public void updateLastCheckin() {
-		this.lastCheckinAt = LocalDateTime.now();
-	}
-
+	
 	/**
 	 * 헌금 기여율 갱신
 	 * 하나은행 연금 갯수 변경 시 호출
@@ -112,16 +101,7 @@ public class User extends BaseEntity {
 	}
 
 	/** 역할 변경 */
-	public void updateRole(String role) {
+	public void updateRole(UserRole role) {
 		this.role = role;
-	}
-
-	/** 미접속 일수 계산 */
-	public long getDaysWithoutCheckin() {
-		if (this.lastCheckinAt == null) return 0;
-		return java.time.temporal.ChronoUnit.DAYS.between(
-			this.lastCheckinAt.toLocalDate(),
-			LocalDate.now()
-		);
 	}
 }

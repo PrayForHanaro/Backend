@@ -32,7 +32,7 @@ public class PointPolicy extends BaseEntity {
 
 	/** 포인트 지급 유형 (unique) */
 	@Column(nullable = false, unique = true, length = 30)
-	private String pointType;
+	private PointType pointType;
 
 	/** 고정 지급 포인트 */
 	@Column(nullable = false)

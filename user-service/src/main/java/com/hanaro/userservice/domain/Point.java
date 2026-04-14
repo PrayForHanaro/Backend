@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
  * ACTIVITY_VOLUNTEER  봉사 활동 참여 (고정 100p)
  * ACTIVITY_CHURCH     교회 행사 참여 (고정 50p)
  * SAVINGS_JOIN        정기 적금 가입 (고정 5000p)
- * SAVINGS_AUTO        자동 이체 실행 (고정 10p)
  */
 @Entity
 @Table(name = "POINT")
@@ -41,7 +40,8 @@ public class Point extends BaseEntity {
 	 * SAVINGS_JOIN / SAVINGS_AUTO
 	 */
 	@Column(nullable = false, length = 30)
-	private String pointType;
+	@Enumerated(EnumType.STRING)
+	private PointType pointType;
 
 	/**
 	 * 지급/차감 포인트
@@ -50,12 +50,12 @@ public class Point extends BaseEntity {
 	@Column(nullable = false)
 	private int amount;
 
-	/**
-	 * 지급 사유 메모
-	 * 예: "홍길동 봉사 활동 참여"
-	 */
-	@Column(length = 200)
-	private String reason;
+	// /**
+	//  * 지급 사유 메모
+	//  * 예: "홍길동 봉사 활동 참여"
+	//  */
+	// @Column(length = 200)
+	// private String reason;
 
 	/**
 	 * 연관 ID (출처 추적용)
@@ -64,13 +64,4 @@ public class Point extends BaseEntity {
 	 */
 	@Column
 	private Long refId;
-
-	/** 생성일시 */
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-	}
 }
