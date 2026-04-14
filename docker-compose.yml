@@ -2,9 +2,23 @@ version: '3.8'
 
 services:
 
-  # =========================
-  # DB
-  # =========================
+  # =============================================
+  # DB 컨테이너 (서비스별 분리)
+  # =============================================
+#  Next에서 인증, spring 토큰 검증이면 필요 없음
+#  auth-db:
+#    image: mysql:8.0
+#    container_name: auth-db
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_DATABASE: auth_db
+#    ports:
+#      - "3307:3306"
+#    volumes:
+#      - auth-db-data:/var/lib/mysql
+#      - ./auth-service/src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+#    networks:
+#      - hana-network
 
   org-db:
     image: mysql:8.0
@@ -72,7 +86,7 @@ services:
       - hana-network
 
   # =========================
-  # Kafka
+  # 인프라 컨티이너
   # =========================
 
   zookeeper:
