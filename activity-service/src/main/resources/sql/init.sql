@@ -30,36 +30,29 @@ CREATE TABLE IF NOT EXISTS ACTIVITY_PHOTO (
     );
 
 CREATE TABLE IF NOT EXISTS ACTIVITY_APPLY (
-    apply_id    BIGINT   NOT NULL AUTO_INCREMENT,
-    activity_id BIGINT   NOT NULL,
-    user_id     BIGINT   NOT NULL,
-    point_earned INT     NOT NULL DEFAULT 0,
-    applied_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    apply_id     BIGINT   NOT NULL AUTO_INCREMENT,
+    activity_id  BIGINT   NOT NULL,
+    user_id      BIGINT   NOT NULL,  -- FK 없음 (다른 DB)
+    point_earned INT      NOT NULL DEFAULT 0,
+    applied_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (apply_id),
     CONSTRAINT uq_activity_apply UNIQUE (activity_id, user_id),
     CONSTRAINT fk_apply_activity
     FOREIGN KEY (activity_id) REFERENCES ACTIVITY (activity_id)
     );
-
-CREATE TABLE IF NOT EXISTS POINT (
-    point_id   BIGINT       NOT NULL AUTO_INCREMENT,
-    user_id    BIGINT       NOT NULL,
-    apply_id   BIGINT       NOT NULL,
-    amount     INT          NOT NULL,
-    reason     VARCHAR(200) NULL,
-    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (point_id),
-    CONSTRAINT fk_point_apply
-    FOREIGN KEY (apply_id) REFERENCES ACTIVITY_APPLY (apply_id)
-    );
+-- ※ 활동 신청 시 user-service API 호출해서 포인트 지급
 
 CREATE TABLE IF NOT EXISTS CALENDAR (
     calendar_id   BIGINT       NOT NULL AUTO_INCREMENT,
-    user_id       BIGINT       NOT NULL,
+    user_id       BIGINT       NOT NULL,  -- FK 없음 (다른 DB)
     activity_id   BIGINT       NULL,
     calendar_type VARCHAR(10)  NOT NULL,
     title         VARCHAR(100) NOT NULL,
     start_date    DATETIME     NOT NULL,
     end_date      DATETIME     NULL,
     memo          VARCHAR(500) NULL,
-    created_at
+    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (calendar_id),
+    CONSTRAINT fk_calendar_activity
+    FOREIGN KEY (activity_id) REFERENCES ACTIVITY (activity_id)
+    );

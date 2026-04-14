@@ -5,20 +5,20 @@ services:
   # =============================================
   # DB 컨테이너 (서비스별 분리)
   # =============================================
-
-  auth-db:
-    image: mysql:8.0
-    container_name: auth-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: auth_db
-    ports:
-      - "3307:3306"
-    volumes:
-      - auth-db-data:/var/lib/mysql
-      - ./auth-service/src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - hana-network
+#  Next에서 인증, spring 토큰 검증이면 필요 없음
+#  auth-db:
+#    image: mysql:8.0
+#    container_name: auth-db
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_DATABASE: auth_db
+#    ports:
+#      - "3307:3306"
+#    volumes:
+#      - auth-db-data:/var/lib/mysql
+#      - ./auth-service/src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+#    networks:
+#      - hana-network
 
   org-db:
     image: mysql:8.0
@@ -141,21 +141,22 @@ services:
     networks:
       - hana-network
 
-  auth-service:
-    build: ./auth-service
-    container_name: auth-service
-    ports:
-      - "8081:8081"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://auth-db:3306/auth_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      EUREKA_URI: http://discovery-server:8761/eureka
-    depends_on:
-      - auth-db
-      - discovery-server
-    networks:
-      - hana-network
+#  Next에서 인증, spring에서 토큰 검증이면 필요 없음
+#  auth-service:
+#    build: ./auth-service
+#    container_name: auth-service
+#    ports:
+#      - "8081:8081"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://auth-db:3306/auth_db
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: root
+#      EUREKA_URI: http://discovery-server:8761/eureka
+#    depends_on:
+#      - auth-db
+#      - discovery-server
+#    networks:
+#      - hana-network
 
   org-service:
     build: ./org-service
