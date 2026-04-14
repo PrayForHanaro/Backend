@@ -1,0 +1,17 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'com.hanaro'
+version = '0.0.1-SNAPSHOT'
+description = 'common'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}

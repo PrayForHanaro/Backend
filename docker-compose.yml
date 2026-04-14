@@ -30,7 +30,6 @@ services:
       - "3308:3306"
     volumes:
       - org-db-data:/var/lib/mysql
-      - ./org-service/src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - hana-network
 
@@ -44,7 +43,6 @@ services:
       - "3309:3306"
     volumes:
       - user-db-data:/var/lib/mysql
-      - ./user-service/src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - hana-network
 
@@ -58,7 +56,6 @@ services:
       - "3310:3306"
     volumes:
       - offering-db-data:/var/lib/mysql
-      - ./offering-service/src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - hana-network
 
@@ -72,7 +69,6 @@ services:
       - "3311:3306"
     volumes:
       - activity-db-data:/var/lib/mysql
-      - ./activity-service/src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - hana-network
 
@@ -86,28 +82,12 @@ services:
       - "3312:3306"
     volumes:
       - prayer-db-data:/var/lib/mysql
-      - ./prayer-service/src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - hana-network
 
-  # =============================================
-  # 인프라 컨테이너
-  # =============================================
-
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    container_name: kafka
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    networks:
-      - hana-network
+  # =========================
+  # 인프라 컨티이너
+  # =========================
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -117,60 +97,35 @@ services:
     networks:
       - hana-network
 
-  # =============================================
-  # 서비스 컨테이너
-  # =============================================
-
-  discovery-server:
-    build: ./discovery-server
-    container_name: discovery-server
-    ports:
-      - "8761:8761"
-    networks:
-      - hana-network
-
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
-    ports:
-      - "8080:8080"
-    environment:
-      EUREKA_URI: http://discovery-server:8761/eureka
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
     depends_on:
-      - discovery-server
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+    ports:
+      - "9092:9092"
     networks:
       - hana-network
 
-#  Next에서 인증, spring에서 토큰 검증이면 필요 없음
-#  auth-service:
-#    build: ./auth-service
-#    container_name: auth-service
-#    ports:
-#      - "8081:8081"
-#    environment:
-#      SPRING_DATASOURCE_URL: jdbc:mysql://auth-db:3306/auth_db
-#      SPRING_DATASOURCE_USERNAME: root
-#      SPRING_DATASOURCE_PASSWORD: root
-#      EUREKA_URI: http://discovery-server:8761/eureka
-#    depends_on:
-#      - auth-db
-#      - discovery-server
-#    networks:
-#      - hana-network
+  # =========================
+  # SERVICES
+  # =========================
 
   org-service:
     build: ./org-service
     container_name: org-service
     ports:
-      - "8082:8082"
+      - "8081:8081"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://org-db:3306/org_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      EUREKA_URI: http://discovery-server:8761/eureka
     depends_on:
       - org-db
-      - discovery-server
     networks:
       - hana-network
 
@@ -178,15 +133,13 @@ services:
     build: ./user-service
     container_name: user-service
     ports:
-      - "8083:8083"
+      - "8082:8082"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://user-db:3306/user_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      EUREKA_URI: http://discovery-server:8761/eureka
     depends_on:
       - user-db
-      - discovery-server
     networks:
       - hana-network
 
@@ -194,16 +147,14 @@ services:
     build: ./offering-service
     container_name: offering-service
     ports:
-      - "8084:8084"
+      - "8083:8083"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://offering-db:3306/offering_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      EUREKA_URI: http://discovery-server:8761/eureka
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - offering-db
-      - discovery-server
       - kafka
     networks:
       - hana-network
@@ -212,16 +163,14 @@ services:
     build: ./activity-service
     container_name: activity-service
     ports:
-      - "8085:8085"
+      - "8084:8084"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://activity-db:3306/activity_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      EUREKA_URI: http://discovery-server:8761/eureka
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - activity-db
-      - discovery-server
       - kafka
     networks:
       - hana-network
@@ -230,22 +179,19 @@ services:
     build: ./prayer-service
     container_name: prayer-service
     ports:
-      - "8086:8086"
+      - "8085:8085"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://prayer-db:3306/prayer_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      EUREKA_URI: http://discovery-server:8761/eureka
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - prayer-db
-      - discovery-server
       - kafka
     networks:
       - hana-network
 
 volumes:
-  auth-db-data:
   org-db-data:
   user-db-data:
   offering-db-data:

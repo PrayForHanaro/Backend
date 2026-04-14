@@ -1,6 +1,6 @@
 rootProject.name = 'pray4hanaro'
 
-include 'api-gateway'
+include 'common'
 include 'org-service'
 include 'user-service'
 include 'offering-service'
