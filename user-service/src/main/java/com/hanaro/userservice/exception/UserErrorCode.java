@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public enum UserErrorCode implements ErrorCode {
-  USER_NOT_FOUND("U001", "유저 없음", 404),
+  USER_NOT_FOUND("U001", "유저를 찾을 수 없습니다", 404),
   DUPLICATE_USER("U002", "중복 유저", 400);
 
   private final String code;
