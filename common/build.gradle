@@ -15,4 +15,12 @@ java {
 dependencies {
     api 'org.springframework.boot:spring-boot-starter-security'
     api 'org.springframework.boot:spring-boot-starter-web'
+
+    // MapStruct 추가
+    api 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    // Lombok과 MapStruct를 같이
+     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    api 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.3'
 }
