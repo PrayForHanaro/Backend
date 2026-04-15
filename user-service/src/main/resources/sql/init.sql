@@ -6,13 +6,14 @@
 CREATE TABLE IF NOT EXISTS USER (
     user_id            BIGINT        NOT NULL AUTO_INCREMENT,
     org_id             BIGINT        NOT NULL COMMENT '소속 교회 ID, org_db 참조 FK없음',
-    district_id        BIGINT        NOT NULL COMMENT '소속 구역 ID, org_db 참조 FK없음',
+    district_id        BIGINT        NULL     COMMENT '소속 구역 ID, org_db 참조 FK없음',
     name               VARCHAR(50)   NOT NULL COMMENT '성도 이름',
     birth_date         DATE          NOT NULL COMMENT '생년월일',
     phone              VARCHAR(20)   NOT NULL UNIQUE COMMENT '전화번호, 로그인 ID로 사용 형식:010-0000-0000',
     role               VARCHAR(10)   NOT NULL DEFAULT '일반사용자' COMMENT '일반사용자/집사/권사/목사/관리자',
     default_account_id BIGINT        NULL     COMMENT '기본 출금 계좌 ID, 순환참조로 후처리',
     donation_rate      DOUBLE        NOT NULL DEFAULT 0 COMMENT '헌금 기여율, 하나은행 연금 1개당 1% 증가',
+    image_type         VARCHAR(20)   DEFAULT 'man' COMMENT '프로필 이미지 타입: man/woman/baby',
     created_at         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id)
@@ -80,25 +81,24 @@ CREATE TABLE IF NOT EXISTS POINT_POLICY (
 
 -- =============================================
 -- USER seed (테스트용)
--- district_id 없음
 -- =============================================
 INSERT INTO USER
-(org_id, name, birth_date, phone, role, donation_rate)
+(org_id, name, birth_date, phone, role, donation_rate, image_type)
 VALUES
     -- 하나교회 (org_id = 1)
-    (1, '홍길동', '1960-03-15', '010-1111-1111', '교직자',      1.0),
-    (1, '김영희', '1965-07-22', '010-2222-2222', '관리자',      2.0),
-    (1, '이철수', '1970-11-05', '010-3333-3333', '일반사용자', 0.0),
-    (1, '박순자', '1958-01-30', '010-4444-4444', '일반사용자',      1.0),
-    (1, '최민준', '1975-09-18', '010-5555-5555', '일반사용자', 0.0),
+    (1, '홍길동', '1960-03-15', '010-1111-1111', '교직자',      1.0, 'man'),
+    (1, '김영희', '1965-07-22', '010-2222-2222', '관리자',      2.0, 'woman'),
+    (1, '이철수', '1970-11-05', '010-3333-3333', '일반사용자', 0.0, 'man'),
+    (1, '박순자', '1958-01-30', '010-4444-4444', '일반사용자',      1.0, 'woman'),
+    (1, '최민준', '1975-09-18', '010-5555-5555', '일반사용자', 0.0, 'baby'),
 
     -- 은혜교회 (org_id = 2)
-    (2, '정미영', '1963-05-12', '010-6666-6666', '교직자',      3.0),
-    (2, '강동원', '1980-02-28', '010-7777-7777', '일반사용자', 0.0),
+    (2, '정미영', '1963-05-12', '010-6666-6666', '교직자',      3.0, 'woman'),
+    (2, '강동원', '1980-02-28', '010-7777-7777', '일반사용자', 0.0, 'man'),
 
     -- 명동성당 (org_id = 4)
-    (4, '윤서연', '1968-08-14', '010-8888-8888', '일반사용자', 0.0),
-    (4, '임재현', '1972-12-03', '010-9999-9999', '교직자',      1.0);
+    (4, '윤서연', '1968-08-14', '010-8888-8888', '일반사용자', 0.0, 'woman'),
+    (4, '임재현', '1972-12-03', '010-9999-9999', '교직자',      1.0, 'man');
 
 -- =============================================
 -- ACCOUNT seed (테스트용)

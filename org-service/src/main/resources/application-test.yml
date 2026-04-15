@@ -20,7 +20,3 @@ spring:
   sql:
     init:
       mode: never
-
-feign:
-  circuitbreaker:
-    enabled: false   # 테스트에서는 필요 없음

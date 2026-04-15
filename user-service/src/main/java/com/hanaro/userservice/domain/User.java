@@ -71,6 +71,10 @@ public class User extends BaseEntity {
 	@Column(nullable = false)
 	private Double donationRate;
 
+	/** 프로필 이미지 타입 (man, woman, baby) */
+	@Column(length = 20)
+	private String imageType;
+
 	// 같은 DB → 양방향 관계 정상 사용
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
@@ -84,6 +88,9 @@ public class User extends BaseEntity {
 	protected void onCreate() {
 		this.donationRate = 0.0;
 		this.role = UserRole.일반사용자;
+		if (this.imageType == null) {
+			this.imageType = "man";
+		}
 	}
 
 	/** 기본 계좌 변경 */
