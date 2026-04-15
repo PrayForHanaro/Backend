@@ -26,12 +26,4 @@ public class ActivityPhoto extends BaseEntity{
 
 	@Column(nullable = false)
 	private int orderNum;       // 1~3
-
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-	}
 }

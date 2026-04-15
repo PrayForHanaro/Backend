@@ -32,11 +32,4 @@ public class ActivityApply extends BaseEntity{
 	@Column(nullable = false)
 	private int pointEarned;
 
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime appliedAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.appliedAt = LocalDateTime.now();
-	}
 }
