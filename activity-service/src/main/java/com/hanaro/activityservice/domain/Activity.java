@@ -32,6 +32,10 @@ public class Activity extends BaseEntity{
 	@Column(nullable = false, length = 10)
 	private ActivityType activityType;      // 일회성/정기
 
+	@Column(nullable = false, length = 15)
+	@Enumerated(EnumType.STRING)
+	private ActivityState activityState;
+
 	@Column(nullable = false, length = 100)
 	private String title;
 
