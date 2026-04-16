@@ -4,11 +4,13 @@
 -- representativeId → user_db 참조, FK 없음
 -- accountId → 교회 계좌, API로 연결 FK 없음
 -- =============================================
+DROP TABLE IF EXISTS RELIGIOUS_ORG;
+
 CREATE TABLE IF NOT EXISTS RELIGIOUS_ORG (
     religious_org_id      BIGINT        NOT NULL AUTO_INCREMENT,
     org_type              VARCHAR(10)   NOT NULL COMMENT '교회/성당/절',
     org_name              VARCHAR(100)  NOT NULL COMMENT '종교단체 이름',
-    address               VARCHAR(30)   NOT NULL COMMENT '주소',
+    address               VARCHAR(100)  NOT NULL COMMENT '주소',
     phone                 VARCHAR(20)   NULL     COMMENT '대표 전화번호',
     representative_id     BIGINT        NULL     COMMENT '대표자 ID, user_db 참조 FK없음',
     account_id            BIGINT        NULL     COMMENT '교회 계좌 ID, API로 연결 FK없음',
