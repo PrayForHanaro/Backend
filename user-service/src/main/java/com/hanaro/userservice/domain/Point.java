@@ -44,6 +44,8 @@ public class Point extends BaseEntity {
 	@Column(nullable = false)
 	private int amount;
 
+	private Long refId;
+
 	// @Column(length = 200)
 	private String info;
 
@@ -58,7 +60,7 @@ public class Point extends BaseEntity {
 	public static Point createOfferingOnce(User user, int amount, String offeringType) {
 		return Point.builder()
 				.user(user)
-				.pointType(PointType.OFFERING_ONCE)
+				.pointType(PointType.OFFERING_SINGLE)
 				.amount(amount)
 				.info("헌금: " + offeringType)
 				.build();

@@ -7,9 +7,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hanaro.common.response.ApiResponse;
 import com.hanaro.common.security.CustomUserDetails;
-import com.hanaro.userservice.dto.UserHomeResponse;
-import com.hanaro.userservice.dto.UserGivingResponse;
-import com.hanaro.userservice.dto.UserSimpleResponse;
+import com.hanaro.userservice.dto.UserGivingResponseDTO;
+import com.hanaro.userservice.dto.UserHomeResponseDTO;
+import com.hanaro.userservice.dto.UserSimpleResponseDTO;
+import com.hanaro.userservice.domain.PointType;
 import com.hanaro.userservice.service.UserService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,28 +25,27 @@ public class UserController {
 	private final UserService userService;
 
 	@GetMapping("/me/home")
-	public ApiResponse<UserHomeResponse> getHome(@AuthenticationPrincipal CustomUserDetails user) {
+	public ApiResponse<UserHomeResponseDTO> getHome(@AuthenticationPrincipal CustomUserDetails user) {
 		return ApiResponse.ok(userService.getHomeInfo(user.getUserId()));
 	}
 
 	@GetMapping("/me/givingOnce")
-	public ApiResponse<UserGivingResponse> getGiving(@AuthenticationPrincipal CustomUserDetails user) {
+	public ApiResponse<UserGivingResponseDTO> getGiving(@AuthenticationPrincipal CustomUserDetails user) {
 		return ApiResponse.ok(userService.getGivingInfo(user.getUserId()));
 	}
 
 	@GetMapping("/list")
-	public ApiResponse<List<UserSimpleResponse>> getList(@RequestParam List<Long> ids) {
+	public ApiResponse<List<UserSimpleResponseDTO>> getList(@RequestParam List<Long> ids) {
 		return ApiResponse.ok(userService.getUserList(ids));
 	}
 
-	/** 포인트 사용 API */
-	public record PointUseRequest(int amount, Long refId) {}
+	/** 포인트 처리 API (적립/차감 통합) */
+	public record PointProcessRequest(int amount, Long refId, PointType pointType, boolean isEarn, Double donationRate) {}
 
-	@PostMapping("/me/points/use")
-	public ApiResponse<Void> usePoints(
-			@AuthenticationPrincipal CustomUserDetails user,
-			@RequestBody PointUseRequest request) {
-		userService.usePoints(user.getUserId(), request.amount(), request.refId());
-		return ApiResponse.ok();
-	}
-}
+	@PostMapping("/me/points/process")
+	public ApiResponse<Void> processPoints(
+	        @AuthenticationPrincipal CustomUserDetails user,
+	        @RequestBody PointProcessRequest request) {
+	    userService.processPoints(user.getUserId(), request.amount(), request.refId(), request.pointType(), request.isEarn(), request.donationRate());
+	    return ApiResponse.ok();
+	}}
