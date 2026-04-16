@@ -17,7 +17,12 @@ public class OrgService {
     public OrgSummaryResponse getSummary(Long orgId) {
         ReligiousOrg org = religiousOrgRepository.findById(orgId)
                 .orElseThrow(() -> new RuntimeException("Organization not found"));
-        return new OrgSummaryResponse(org.getOrgName(), org.getTotalOfferingAmount());
+        
+        // 만원 단위로 변환 (소수점 이하 버림)
+        BigDecimal totalInTenThousand = org.getTotalOfferingAmount()
+                .divide(new BigDecimal("10000"), 0, java.math.RoundingMode.DOWN);
+                
+        return new OrgSummaryResponse(org.getOrgName(), totalInTenThousand);
     }
 
     /** 교회 누적 헌금액 업데이트 */

@@ -27,7 +27,7 @@ public class UserService {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new RuntimeException("User not found"));
 		int totalPoint = user.getPoints().stream().mapToInt(Point::getAmount).sum();
-		return new UserHomeResponse(user.getName(), totalPoint, user.getOrgId());
+		return new UserHomeResponse(user.getName(), totalPoint, user.getOrgId(), user.getDonationRate());
 	}
 
 	public UserGivingResponse getGivingInfo(Long userId) {
@@ -39,7 +39,7 @@ public class UserService {
 		String accountNum = (account != null) ? account.getAccountNumber() : "계좌 없음";
 		Long accountId = (account != null) ? account.getAccountId() : null;
 		
-		return new UserGivingResponse(user.getName(), totalPoint, accountNum, user.getOrgId(), accountId);
+		return new UserGivingResponse(user.getName(), totalPoint, accountNum, user.getOrgId(), accountId, user.getDonationRate());
 	}
 
 	public List<UserSimpleResponse> getUserList(List<Long> ids) {

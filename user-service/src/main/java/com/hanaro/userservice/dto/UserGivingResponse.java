@@ -7,5 +7,6 @@ public record UserGivingResponse(
     BigDecimal maxPoint, 
     String bankAccount, 
     Long orgId, 
-    Long accountId // 헌금 시 필요한 계좌 ID 추가
+    Long accountId,
+    Double donationRate
 ) {}
