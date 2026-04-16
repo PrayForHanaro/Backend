@@ -122,7 +122,7 @@ services:
     build: ./org-service
     container_name: org-service
     ports:
-      - "8081:8081"
+      - "8081:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://org-db:3306/org_db
       SPRING_DATASOURCE_USERNAME: root
@@ -136,7 +136,7 @@ services:
     build: ./user-service
     container_name: user-service
     ports:
-      - "8082:8082"
+      - "8082:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://user-db:3306/user_db
       SPRING_DATASOURCE_USERNAME: root
@@ -150,7 +150,7 @@ services:
     build: ./offering-service
     container_name: offering-service
     ports:
-      - "8083:8083"
+      - "8083:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://offering-db:3306/offering_db
       SPRING_DATASOURCE_USERNAME: root
@@ -166,7 +166,7 @@ services:
     build: ./activity-service
     container_name: activity-service
     ports:
-      - "8084:8084"
+      - "8084:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://activity-db:3306/activity_db
       SPRING_DATASOURCE_USERNAME: root
@@ -182,7 +182,7 @@ services:
     build: ./prayer-service
     container_name: prayer-service
     ports:
-      - "8085:8085"
+      - "8085:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://prayer-db:3306/prayer_db
       SPRING_DATASOURCE_USERNAME: root
