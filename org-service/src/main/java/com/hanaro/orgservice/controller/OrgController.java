@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping("/api/orgs")
+@RequestMapping("/apis/org/orgs")
 @RequiredArgsConstructor
 public class OrgController {
 
