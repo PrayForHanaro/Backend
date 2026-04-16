@@ -43,6 +43,8 @@ public class User extends BaseEntity {
 	@Column(nullable = false, unique = true, length = 20)
 	private String phone;
 
+	@Column(nullable = false)
+	private String password;
 	/**
 	 * 역할
 	 * ex 일반 / 집사 / 권사 / 목사 / 관리자
