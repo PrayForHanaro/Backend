@@ -1,27 +1,36 @@
 package com.hanaro.common.security;
 
-import lombok.Builder;
+import com.hanaro.common.auth.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @Getter
-@Builder
 public class CustomUserDetails implements UserDetails {
+
     private final Long userId;
-    private final String email;
-    private final String role;
-    private final Collection<? extends GrantedAuthority> authorities;
+    private final Long orgId;
+    private final String name;
+    private final UserRole role;
+
+    public CustomUserDetails(Long userId, Long orgId, String name, UserRole role) {
+        this.userId = userId;
+        this.orgId = orgId;
+        this.name = name;
+        this.role = role;
+    }
 
     public boolean isManager() {
-        return "교직자".equals(role) || "관리자".equals(role);
+        return role == UserRole.CLERGY || role == UserRole.ADMIN;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
@@ -31,7 +40,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return String.valueOf(userId);
     }
 
     @Override
