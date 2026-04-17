@@ -27,9 +27,6 @@ dependencies {
     testImplementation 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // MSA 통신용
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:5.0.1'
-
     // 일반 서비스용 Swagger (WebMVC)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1'
 

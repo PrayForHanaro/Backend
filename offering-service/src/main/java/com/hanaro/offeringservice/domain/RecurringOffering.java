@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import org.apache.kafka.shaded.com.google.protobuf.Enum;
 
 /**
  * 정기 헌금 자동이체 설정
@@ -47,7 +46,7 @@ public class RecurringOffering extends BaseEntity{
 	 */
 	@Column(nullable = false, length = 20)
 	@Enumerated(EnumType.STRING)
-	private Enum offeringType;
+	private OfferingType offeringType;
 
 	/** 매달 자동이체 금액 */
 	@Column(nullable = false)

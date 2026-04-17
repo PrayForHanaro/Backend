@@ -43,7 +43,7 @@ public class Offering extends BaseEntity{
 	private OfferingType offeringType;
 
 	/** 헌금 금액 */
-	@Column(nullable = false)
+	@Column(nullable = false, precision = 15, scale = 2)
 	private BigDecimal amount;
 
 	@Column(length = 50) //무기명이면 null
@@ -52,4 +52,7 @@ public class Offering extends BaseEntity{
 	/** 기도제목 (최대 250자, 선택) */
 	@Column(length = 250)
 	private String prayerContent;
+
+	/** 사용한 포인트 (0일 수 있음) */
+	private BigDecimal usedPoint;
 }
