@@ -36,7 +36,7 @@ public class OrgService {
 
     public OrgMyPageResponseDTO getMyOrg(Long orgId){
         ReligiousOrg org = religiousOrgRepository
-            .getReligiousOrgByReligiousOrgId(orgId)
+            .findById(orgId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 교회"));
 
         return OrgMyPageResponseDTO.from(org);
