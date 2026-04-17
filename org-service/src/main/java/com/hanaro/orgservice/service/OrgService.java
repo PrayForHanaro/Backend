@@ -1,6 +1,7 @@
 package com.hanaro.orgservice.service;
 
 import com.hanaro.orgservice.domain.ReligiousOrg;
+import com.hanaro.orgservice.dto.OrgMyPageResponseDTO;
 import com.hanaro.orgservice.dto.OrgSummaryResponse;
 import com.hanaro.orgservice.repository.ReligiousOrgRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,13 @@ public class OrgService {
         ReligiousOrg org = religiousOrgRepository.findById(orgId)
                 .orElseThrow(() -> new RuntimeException("Organization not found"));
         org.addOfferingAmount(amount);
+    }
+
+    public OrgMyPageResponseDTO getMyOrg(Long orgId){
+        ReligiousOrg org = religiousOrgRepository
+            .getReligiousOrgByReligiousOrgId(orgId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 교회"));
+
+        return OrgMyPageResponseDTO.from(org);
     }
 }

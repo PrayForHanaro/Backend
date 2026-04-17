@@ -1,16 +1,29 @@
 package com.hanaro.userservice.controller;
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
+import com.hanaro.common.security.CustomUserDetails;
+import com.hanaro.userservice.dto.response.PageResponseDTO;
+import com.hanaro.userservice.dto.response.PointResponseDTO;
+import com.hanaro.userservice.service.PointService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/internal/points")
+@RequestMapping("/user/points")
+@RequiredArgsConstructor
 public class PointController {
 
-  //포인트 생성
+  private final PointService pointService;
 
-  @PostMapping("/points")
-  void createPoint(PointRequest request);
+  @GetMapping
+  public PageResponseDTO<PointResponseDTO> getPointList(
+      @AuthenticationPrincipal CustomUserDetails user,
+      @PageableDefault(size = 10) Pageable pageable
+  ) {
+    return pointService.getPointList(user.getUserId(), pageable);
+  }
 }

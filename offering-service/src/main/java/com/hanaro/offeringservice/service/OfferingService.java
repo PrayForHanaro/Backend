@@ -1,8 +1,10 @@
 package com.hanaro.offeringservice.service;
 
+import com.hanaro.offeringservice.client.user.UserClient;
 import com.hanaro.offeringservice.domain.Offering;
 import com.hanaro.offeringservice.domain.OfferingType;
 import com.hanaro.offeringservice.dto.OfferingRequestDTO;
+import com.hanaro.offeringservice.dto.UsePointRequest;
 import com.hanaro.offeringservice.repository.OfferingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OfferingService {
     private final OfferingRepository offeringRepository;
+    private final UserClient userClient;
 
     @Transactional
     public Long registerOffering(Long userId, OfferingRequestDTO request) {
@@ -26,6 +29,7 @@ public class OfferingService {
                 .prayerContent(request.getPrayerTopic())
                 .build();
 
+        userClient.usePoint(new UsePointRequest(request.getPoint()));
         return offeringRepository.save(offering).getOfferingId();
     }
 }
