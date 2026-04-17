@@ -31,6 +31,7 @@ dependencies {
 
     // 일반 서비스용 Swagger (WebMVC)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:5.0.1'
 
     implementation project(':common')
 }

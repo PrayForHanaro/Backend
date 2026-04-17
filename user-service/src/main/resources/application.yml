@@ -3,11 +3,7 @@ spring:
     active: local
   application:
     name: user-service
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://user-db:3306/user_db
-    username: root
-    password: root
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -24,3 +20,7 @@ spring:
   sql:
     init:
       mode: never
+feign:
+  circuitbreaker:
+    enabled: true
+

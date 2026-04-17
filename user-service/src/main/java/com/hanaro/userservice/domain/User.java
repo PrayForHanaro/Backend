@@ -27,7 +27,7 @@ public class User extends BaseEntity {
 	private Long userId;
 
 	/** 소속 교회/성당/절 ID (org_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private Long orgId;
 
 	/** 이름 */
@@ -55,7 +55,9 @@ public class User extends BaseEntity {
 	@Column(nullable = false, length = 10)
 	private UserRole role;
 
-	/**
+	@Column(nullable = true)
+	String profileUrl;
+		/**
 	 * 기본 출금 계좌 ID
 	 * 같은 DB이지만 순환참조로 인해 FK 후처리
 	 * (ACCOUNT 테이블 생성 후 ALTER TABLE로 FK 추가)
@@ -88,8 +90,10 @@ public class User extends BaseEntity {
 	@PrePersist
 	protected void onCreate() {
 		this.donationRate = 0.0;
-        this.role = UserRole.USER;
+		this.role = UserRole.USER;
+		this.pointSum = 0;
 	}
+
 
 	/** 기본 계좌 변경 */
 	public void updateDefaultAccount(Account account) {

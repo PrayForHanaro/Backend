@@ -11,6 +11,7 @@ import com.hanaro.offeringservice.dto.event.OfferingEvent;
 import com.hanaro.offeringservice.repository.OfferingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +37,7 @@ public class OfferingService {
 
         // 1. 계좌 잔액 차감 (Feign - 동기 방식)
         // 잔액 부족 시 여기서 RuntimeException 발생 -> 트랜잭션 롤백
-        accountClient.withdraw(request.getAccountId(), 
+        accountClient.withdraw(request.getAccountId(),
                 new AccountWithdrawRequest(request.getAmount()));
 
         Offering offering = Offering.builder()
@@ -69,4 +70,3 @@ public class OfferingService {
         return offeringId;
     }
 }
-

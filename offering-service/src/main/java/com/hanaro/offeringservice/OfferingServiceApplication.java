@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients
 @SpringBootApplication(scanBasePackages = "com.hanaro")
+@EnableFeignClients
 public class OfferingServiceApplication {
 
     public static void main(String[] args) {

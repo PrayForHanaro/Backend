@@ -1,16 +1,9 @@
-server:
-  port: 8084
-
 spring:
   profiles:
     active: local
   application:
     name: activity-service
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://activity-db:3306/activity_db
-    username: root
-    password: root
+
   jpa:
     hibernate:
       ddl-auto: update
