@@ -56,8 +56,9 @@ public class UserController {
 
   //사용가능 포인트 조회
   @GetMapping("/point")
-  public int getAvailablePoint(@AuthenticationPrincipal CustomUserDetails user) {
-    return userService.getPointSum(user.getUserId());
+  @GetMapping("/point")
+  public ApiResponse<Integer> getAvailablePoint(@AuthenticationPrincipal CustomUserDetails user) {
+    return ApiResponse.ok(userService.getPointSum(user.getUserId()));
   }
 
 	@GetMapping("/me")
