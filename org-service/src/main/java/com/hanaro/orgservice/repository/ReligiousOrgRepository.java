@@ -8,6 +8,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReligiousOrgRepository extends JpaRepository<ReligiousOrg, Long> {
-
-  Optional<ReligiousOrg> getReligiousOrgByReligiousOrgId(Long religiousOrgId);
 }

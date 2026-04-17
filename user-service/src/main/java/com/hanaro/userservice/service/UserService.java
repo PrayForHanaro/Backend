@@ -1,6 +1,5 @@
 package com.hanaro.userservice.service;
 
-import com.hanaro.common.auth.UserRole;
 import com.hanaro.userservice.client.OrgClient;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
 import com.hanaro.userservice.dto.request.UsePointRequest;
@@ -31,6 +30,7 @@ public class UserService {
   private final OrgClient orgClient;
   private final PasswordEncoder passwordEncoder;
 
+  @Transactional
   public void signUp(SignUpRequestDTO request) {
 
       if (userRepository.existsByPhone(request.getPhoneNumber())) {
@@ -69,7 +69,7 @@ public class UserService {
     }
 
     public UserMyPageResponseDTO getMyPageInfo(Long userId){
-      User user = userRepository.findById(userId).orElseThrow();
+      User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
       OrgMyPageResponseDTO orgDto = orgClient.getOrg();
 
       return UserMyPageResponseDTO.of(user, orgDto);
