@@ -31,6 +31,7 @@ public class UserService {
   private final OrgClient orgClient;
   private final PasswordEncoder passwordEncoder;
 
+  @Transactional
   public void signUp(SignUpRequestDTO request) {
 
       if (userRepository.existsByPhone(request.getPhoneNumber())) {
