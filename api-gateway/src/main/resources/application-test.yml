@@ -1,7 +1,4 @@
 spring:
-  config:
-    import: optional:classpath:security.yml
-
   profiles:
     active: local
 
@@ -42,3 +39,32 @@ downstream:
   prayer-service: http://prayer-service:8080
   user-service: http://user-service:8080
   org-service: http://org-service:8080
+
+jwt:
+  secret: ${JWT_SECRET}
+  issuer: ${JWT_ISSUER}
+  audience: ${JWT_AUDIENCE}
+  cookie-name: ${JWT_COOKIE_NAME}
+
+security:
+  auth:
+    permit-paths:
+      - /health
+      - /info
+      - /actuator/health
+      - /public/**
+      - /error
+    admin-paths:
+      - /api/admin/**
+
+  internal-headers:
+    user-id: X-User-Id
+    user-role: X-User-Role
+    user-name: X-User-Name
+    org-id: X-Org-Id
+
+  remove-external-headers:
+    - X-User-Id
+    - X-User-Role
+    - X-User-Name
+    - X-Org-Id
