@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/gifts")
+@RequestMapping("/apis/prayer/prayers")
 @RequiredArgsConstructor
 public class GiftController {
 
     private final GiftService giftService;
 
-    @GetMapping("/myReceivers")
+    @GetMapping("/me")
     public ApiResponse<List<GiftReceiverResponse>> getMyReceivers(@AuthenticationPrincipal CustomUserDetails user) {
         return ApiResponse.ok(giftService.getMyReceivers(user.getUserId()));
     }
