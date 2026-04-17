@@ -1,20 +1,17 @@
-package com.hanaro.userservice.dto;
+package com.hanaro.userservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserGivingResponseDTO {
-    private String name;
-    private BigDecimal maxPoint;
-    private String bankAccount;
+public class UserHomeResponseDTO {
+    private String userName;
+    private int myPoint;
     private Long orgId;
-    private Long accountId;
     private Double donationRate;
 }

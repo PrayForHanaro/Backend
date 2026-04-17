@@ -4,7 +4,6 @@ import com.hanaro.common.auth.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +43,9 @@ public class User extends BaseEntity {
 	@Column(nullable = false, unique = true, length = 20)
 	private String phone;
 
-	@Column(nullable = false)
+  @Column(nullable = false, length = 255)
 	private String password;
+
 	/**
 	 * 역할
 	 * ex 일반 / 집사 / 권사 / 목사 / 관리자
@@ -74,9 +74,7 @@ public class User extends BaseEntity {
 	@Column(nullable = false)
 	private Double donationRate;
 
-	/** 프로필 이미지 타입 (man, woman, baby) */
-	@Column(length = 20)
-	private String imageType;
+	private int pointSum;
 
 	// 같은 DB → 양방향 관계 정상 사용
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -91,10 +89,6 @@ public class User extends BaseEntity {
 	protected void onCreate() {
 		this.donationRate = 0.0;
         this.role = UserRole.USER;
-		if (this.imageType == null) {
-			this.imageType = "man";
-		}
-
 	}
 
 	/** 기본 계좌 변경 */
@@ -114,5 +108,13 @@ public class User extends BaseEntity {
 	/** 역할 변경 */
 	public void updateRole(UserRole role) {
 		this.role = role;
+	}
+
+	public void addPoint(int amount){
+		this.pointSum+=amount;
+	}
+
+	public void minusPoint(int amount){
+		this.pointSum-=amount;
 	}
 }

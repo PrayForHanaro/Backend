@@ -7,10 +7,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hanaro.common.response.ApiResponse;
 import com.hanaro.common.security.CustomUserDetails;
-import com.hanaro.userservice.dto.UserGivingResponseDTO;
-import com.hanaro.userservice.dto.UserHomeResponseDTO;
-import com.hanaro.userservice.dto.UserSimpleResponseDTO;
-import com.hanaro.userservice.domain.PointType;
+import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
+import com.hanaro.userservice.dto.response.UserHomeResponseDTO;
+import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
 import com.hanaro.userservice.service.UserService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,13 +38,12 @@ public class UserController {
 		return ApiResponse.ok(userService.getUserList(ids));
 	}
 
-	/** 포인트 처리 API (적립/차감 통합) */
-	public record PointProcessRequest(int amount, Long refId, PointType pointType, boolean isEarn, Double donationRate) {}
-
-	@PostMapping("/me/points/process")
-	public ApiResponse<Void> processPoints(
-	        @AuthenticationPrincipal CustomUserDetails user,
-	        @RequestBody PointProcessRequest request) {
-	    userService.processPoints(user.getUserId(), request.amount(), request.refId(), request.pointType(), request.isEarn(), request.donationRate());
-	    return ApiResponse.ok();
-	}}
+  //회원가입
+  //마이페이지 정보 : 보유한 포인트, 프로필 사진, 이름, 교회 이름
+  //로그아웃
+  //사용가능 포인트 조회
+  @GetMapping("/point")
+  public int getAvailablePoint(@AuthenticationPrincipal CustomUserDetails user) {
+    return userService.getPointSum(user.getUserId());
+  }
+}
