@@ -70,7 +70,11 @@ public class Gift extends BaseEntity {
 	@Column(nullable = false)
 	private BigDecimal cumulativeTotal;
 
-	/** 적금 상품 이름 */
+	/** 가입한 적금 상품 ID. 상품 변경·삭제와 독립적으로 이 Gift의 스냅샷(name·rate)은 유지 */
+	@Column(nullable = false)
+	private Long savingsProductId;
+
+	/** 적금 상품 이름 (가입 시점 스냅샷) */
 	@Column(nullable = false)
 	private String savingsProductName;
 

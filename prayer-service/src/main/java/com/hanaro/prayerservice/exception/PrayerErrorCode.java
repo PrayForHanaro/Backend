@@ -16,6 +16,8 @@ public enum PrayerErrorCode implements ErrorCode {
 
     GIFT_NOT_FOUND("P001", "기도적금을 찾을 수 없습니다", 404),
     GIFT_NOT_OWNED("P002", "기도적금 접근 권한이 없습니다", 403),
+    DUPLICATE_GIFT("P003", "이미 해당 대상자에게 가입된 기도적금이 있습니다", 409),
+    NO_DEFAULT_ACCOUNT("P005", "기본 출금 계좌를 먼저 등록해주세요", 400),
 
     MESSAGE_NOT_FOUND("P101", "기도 메시지를 찾을 수 없습니다", 404),
     MESSAGE_NOT_OWNED("P102", "메시지 수정 권한이 없습니다", 403),
