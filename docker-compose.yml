@@ -1,97 +1,6 @@
 version: '3.8'
 
 services:
-
-  # =============================================
-  # DB 컨테이너 (서비스별 분리)
-  # =============================================
-
-
-
-#  Next에서 인증, spring 토큰 검증이면 필요 없음
-#  auth-db:
-#    image: mysql:8.0
-#    container_name: auth-db
-#    environment:
-#      MYSQL_ROOT_PASSWORD: root
-#      MYSQL_DATABASE: auth_db
-#    ports:
-#      - "3307:3306"
-#    volumes:
-#      - auth-db-data:/var/lib/mysql
-#      - ./auth-service/src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
-#    networks:
-#      - hana-network
-
-  org-db:
-    image: mysql:8.0
-    container_name: org-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: org_db
-    ports:
-      - "3308:3306"
-    volumes:
-      - org-db-data:/var/lib/mysql
-    networks:
-      - hana-network
-
-  user-db:
-    image: mysql:8.0
-    container_name: user-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: user_db
-    ports:
-      - "3309:3306"
-    volumes:
-      - user-db-data:/var/lib/mysql
-    networks:
-      - hana-network
-
-  offering-db:
-    image: mysql:8.0
-    container_name: offering-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: offering_db
-    ports:
-      - "3310:3306"
-    volumes:
-      - offering-db-data:/var/lib/mysql
-    networks:
-      - hana-network
-
-  activity-db:
-    image: mysql:8.0
-    container_name: activity-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: activity_db
-    ports:
-      - "3311:3306"
-    volumes:
-      - activity-db-data:/var/lib/mysql
-    networks:
-      - hana-network
-
-  prayer-db:
-    image: mysql:8.0
-    container_name: prayer-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: prayer_db
-    ports:
-      - "3312:3306"
-    volumes:
-      - prayer-db-data:/var/lib/mysql
-    networks:
-      - hana-network
-
-  # =========================
-  # 인프라 컨티이너
-  # =========================
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
@@ -114,9 +23,85 @@ services:
     networks:
       - hana-network
 
-  # =========================
-  # SERVICES
-  # =========================
+  org-db:
+    image: mysql:8.0
+    container_name: org-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: org_db
+    ports:
+      - "3308:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hana-network
+
+  user-db:
+    image: mysql:8.0
+    container_name: user-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: user_db
+    ports:
+      - "3309:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hana-network
+
+  offering-db:
+    image: mysql:8.0
+    container_name: offering-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: offering_db
+    ports:
+      - "3310:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hana-network
+
+  activity-db:
+    image: mysql:8.0
+    container_name: activity-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: activity_db
+    ports:
+      - "3311:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hana-network
+
+  prayer-db:
+    image: mysql:8.0
+    container_name: prayer-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: prayer_db
+    ports:
+      - "3312:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hana-network
 
   org-service:
     build: ./org-service
@@ -128,7 +113,8 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
     depends_on:
-      - org-db
+      org-db:
+        condition: service_healthy
     networks:
       - hana-network
 
@@ -142,7 +128,8 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
     depends_on:
-      - user-db
+      user-db:
+        condition: service_healthy
     networks:
       - hana-network
 
@@ -157,8 +144,10 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      - offering-db
-      - kafka
+      offering-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     networks:
       - hana-network
 
@@ -172,9 +161,16 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_PROFILES_ACTIVE: prod
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_REGION: ${AWS_REGION}
     depends_on:
-      - activity-db
-      - kafka
+      activity-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     networks:
       - hana-network
 
@@ -189,17 +185,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      - prayer-db
-      - kafka
+      prayer-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     networks:
       - hana-network
-
-volumes:
-  org-db-data:
-  user-db-data:
-  offering-db-data:
-  activity-db-data:
-  prayer-db-data:
 
 networks:
   hana-network:

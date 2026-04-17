@@ -11,10 +11,13 @@ import com.hanaro.activityservice.dto.request.ActivityRequest;
 import com.hanaro.activityservice.dto.response.ActivityResponse;
 import com.hanaro.activityservice.repository.ActivityApplyRepository;
 import com.hanaro.activityservice.repository.ActivityRepository;
+import com.hanaro.common.storage.StorageService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,6 +43,7 @@ public class ActivityService {
 
     private final ActivityRepository activityRepository;
     private final ActivityApplyRepository activityApplyRepository;
+    private final StorageService storageService;
 
     public List<ActivityResponse.Summary> getActivities(
             Long userId,
@@ -67,7 +71,7 @@ public class ActivityService {
     }
 
     @Transactional
-    public ActivityResponse.Detail createActivity(Long userId, Long orgId, ActivityRequest request) {
+    public ActivityResponse.Detail createActivity(Long userId, Long orgId, ActivityRequest request, List<MultipartFile> files) {
         validateCreateRequest(request);
 
         Long resolvedUserId = resolveUserId(userId);
@@ -93,13 +97,11 @@ public class ActivityService {
                 .pointAmount(request.getPointAmount() != null ? request.getPointAmount() : 30)
                 .build();
 
-        List<String> imageUrls = safeList(request.getImageUrls());
-
-        for (int index = 0; index < imageUrls.size() && index < 3; index++) {
-            String imageUrl = imageUrls.get(index);
-
-            if (StringUtils.hasText(imageUrl)) {
-                activity.addPhoto(imageUrl, index + 1);
+        // 이미지 업로드 로직 추가
+        if (files != null) {
+            for (int i = 0; i < files.size() && i < 3; i++) {
+                String imageUrl = storageService.upload(files.get(i), "activity");
+                activity.addPhoto(imageUrl, i + 1);
             }
         }
 

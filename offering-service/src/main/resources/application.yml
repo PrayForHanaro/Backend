@@ -1,4 +1,11 @@
+server:
+  port: 8080
+
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   profiles:
     active: local
   application:
@@ -27,9 +34,6 @@ spring:
 
   kafka:
     bootstrap-servers: kafka:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
       properties:
         reconnect:
@@ -37,7 +41,9 @@ spring:
             ms: 1000
             max:
               ms: 10000
-
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 feign:
   circuitbreaker:
     enabled: true

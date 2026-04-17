@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
     name = "user-service",
-    url = "http://user-service:8083"
+    url = "http://user-service:8080"
 )
 public interface UserClient {
     @PostMapping("/internal/users/{userId}/points/use")

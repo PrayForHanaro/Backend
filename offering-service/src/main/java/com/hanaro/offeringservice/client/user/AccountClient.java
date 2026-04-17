@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 // 보내는 쪽의 정보를 쓴다. client 는 받는쪽에 만든다.
 @FeignClient(
     name = "user-service",
-    url = "http://user-service:8083"
-) // 인터페이스로 작성
+    url = "http://user-service:8080"
+)
 public interface AccountClient {
+
     @PostMapping("/internal/accounts/{accountId}/withdraw")
     void withdraw(@PathVariable Long accountId, @RequestBody AccountWithdrawRequest request);
 }
