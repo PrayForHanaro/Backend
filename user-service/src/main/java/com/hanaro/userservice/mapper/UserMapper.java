@@ -1,9 +1,9 @@
 package com.hanaro.userservice.mapper;
 
 import com.hanaro.userservice.domain.User;
-import com.hanaro.userservice.dto.UserGivingResponseDTO;
-import com.hanaro.userservice.dto.UserHomeResponseDTO;
-import com.hanaro.userservice.dto.UserSimpleResponseDTO;
+import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
+import com.hanaro.userservice.dto.response.UserHomeResponseDTO;
+import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

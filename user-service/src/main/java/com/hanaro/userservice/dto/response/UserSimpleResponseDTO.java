@@ -1,4 +1,4 @@
-package com.hanaro.userservice.dto;
+package com.hanaro.userservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
