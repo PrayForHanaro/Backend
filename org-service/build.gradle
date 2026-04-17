@@ -31,6 +31,9 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1'
 
     implementation project(':common')
+
+    // Kafka 추가
+    implementation 'org.springframework.kafka:spring-kafka'
 }
 
 tasks.named('test') {

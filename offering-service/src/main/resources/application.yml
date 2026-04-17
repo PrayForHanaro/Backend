@@ -27,16 +27,17 @@ spring:
 
   kafka:
     bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
       properties:
         reconnect:
-        backoff:
+          backoff:
             ms: 1000
             max:
               ms: 10000
-  producer:
-    key-serializer: org.apache.kafka.common.serialization.StringSerializer
-    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 feign:
   circuitbreaker:
     enabled: true

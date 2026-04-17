@@ -5,11 +5,12 @@ import com.hanaro.offeringservice.domain.Offering;
 import com.hanaro.offeringservice.domain.OfferingType;
 import com.hanaro.offeringservice.dto.OfferingRequestDTO;
 import com.hanaro.offeringservice.dto.UsePointRequest;
+import com.hanaro.offeringservice.dto.event.OfferingEvent;
 import com.hanaro.offeringservice.repository.OfferingRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Arrays;
 
 @Service
@@ -17,6 +18,7 @@ import java.util.Arrays;
 public class OfferingService {
     private final OfferingRepository offeringRepository;
     private final UserClient userClient;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
 
     @Transactional
@@ -40,10 +42,19 @@ public class OfferingService {
 
         Long offeringId = offeringRepository.save(offering).getOfferingId();
 
-        // 사용한 포인트가 있다면 user-service에 포인트 차감 요청 (Feign)
-        if (request.getUsedPoint() > 0) {
+        // 1. 사용한 포인트가 있다면 user-service에 포인트 차감 요청 (Feign)
+        if (request.getUsedPoint().intValue() > 0) {
             userClient.usePoint(userId, new UsePointRequest(request.getUsedPoint().intValue()));
         }
+
+        // 2. Kafka 이벤트 발행 (포인트 적립 및 교회 총액 업데이트용)
+        kafkaTemplate.send("offering-topic", OfferingEvent.builder()
+                .userId(userId)
+                .orgId(request.getOrgId())
+                .amount(request.getAmount())
+                .usedPoint(request.getUsedPoint().intValue())
+                .offeringType(type.name())
+                .build());
 
         return offeringId;
     }
