@@ -25,7 +25,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public boolean isManager() {
-        return role == UserRole.교직자 || role == UserRole.관리자;
+        return role == UserRole.CLERGY || role == UserRole.ADMIN;
     }
 
     @Override

@@ -86,7 +86,7 @@ public class User extends BaseEntity {
 	@PrePersist
 	protected void onCreate() {
 		this.donationRate = 0.0;
-		this.role = UserRole.일반사용자;
+		this.role = UserRole.USER;
 	}
 
 	/** 기본 계좌 변경 */
