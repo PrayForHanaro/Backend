@@ -39,6 +39,9 @@ dependencies {
     // 헬스체크, 운영 확인
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    // MVC 기반 프록시 라우팅 쓸 거면
+    implementation 'org.springframework.cloud:spring-cloud-gateway-proxyexchange-webmvc'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

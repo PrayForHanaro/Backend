@@ -19,6 +19,11 @@ repositories {
 }
 
 dependencies {
+    implementation platform("org.springframework.cloud:spring-cloud-dependencies:2025.0.2")
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+}
+
+dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'com.mysql:mysql-connector-j'
@@ -27,10 +32,10 @@ dependencies {
     testImplementation 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Kafka 추가
     implementation 'org.springframework.kafka:spring-kafka'
-
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
     implementation project(':common')
 }
@@ -38,5 +43,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-
