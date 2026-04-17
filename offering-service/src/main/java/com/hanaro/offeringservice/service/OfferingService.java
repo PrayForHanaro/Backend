@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+
 @Service
 @RequiredArgsConstructor
 public class OfferingService {
@@ -15,11 +17,17 @@ public class OfferingService {
 
     @Transactional
     public Long registerOffering(Long userId, OfferingRequestDTO request) {
+        // OfferingType 안전하게 변환
+        OfferingType type = Arrays.stream(OfferingType.values())
+                .filter(o -> o.name().equals(request.getType()))
+                .findFirst()
+                .orElse(OfferingType.기타);
+
         Offering offering = Offering.builder()
                 .userId(userId)
                 .orgId(request.getOrgId())
                 .accountId(request.getAccountId())
-                .offeringType(OfferingType.valueOf(request.getType()))
+                .offeringType(type)
                 .amount(request.getAmount())
                 .usedPoint(request.getUsedPoint())
                 .offererName("무기명".equals(request.getPersonType()) ? null : request.getName())

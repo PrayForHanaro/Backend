@@ -22,7 +22,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return userMapper.toUserHomeResponseDTO(user);
-    }
+}
 
     public UserGivingResponseDTO getGivingInfo(Long userId) {
         User user = userRepository.findById(userId)
@@ -37,12 +37,12 @@ public class UserService {
     }
 
     @Transactional
-    public void processPoints(Long userId, int amount, Long refId, PointType pointType, boolean isEarn, Double donationRate) {
+    public void processPoints(Long userId, int amount, Long refId, PointType pointType, boolean isEarn) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         int finalAmount = isEarn 
-                ? (int) (amount * donationRate) // 줄 때, 받을 때 전부 0.01 처럼 소수로 받음
+                ? (int) (amount * user.getDonationRate()) // 줄 때, 받을 때 전부 0.01 처럼 소수로 받음
                 : amount;
 
         Point point = Point.builder()

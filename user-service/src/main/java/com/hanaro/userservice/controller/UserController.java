@@ -10,7 +10,7 @@ import com.hanaro.common.security.CustomUserDetails;
 import com.hanaro.userservice.dto.UserGivingResponseDTO;
 import com.hanaro.userservice.dto.UserHomeResponseDTO;
 import com.hanaro.userservice.dto.UserSimpleResponseDTO;
-import com.hanaro.userservice.domain.PointType;
+// import com.hanaro.userservice.domain.PointType;
 import com.hanaro.userservice.service.UserService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,14 +38,4 @@ public class UserController {
 	public ApiResponse<List<UserSimpleResponseDTO>> getList(@RequestParam List<Long> ids) {
 		return ApiResponse.ok(userService.getUserList(ids));
 	}
-
-	/** 포인트 처리 API (적립/차감 통합) */
-	public record PointProcessRequest(int amount, Long refId, PointType pointType, boolean isEarn, Double donationRate) {}
-
-	@PostMapping("/me/points/process")
-	public ApiResponse<Void> processPoints(
-	        @AuthenticationPrincipal CustomUserDetails user,
-	        @RequestBody PointProcessRequest request) {
-	    userService.processPoints(user.getUserId(), request.amount(), request.refId(), request.pointType(), request.isEarn(), request.donationRate());
-	    return ApiResponse.ok();
-	}}
+}
