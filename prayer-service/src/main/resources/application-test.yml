@@ -1,5 +1,5 @@
 server:
-  port: 8083   # 랜덤 포트 (충돌 방지)
+  port: 0   # 랜덤 포트 (충돌 방지)
 
 spring:
   application:
