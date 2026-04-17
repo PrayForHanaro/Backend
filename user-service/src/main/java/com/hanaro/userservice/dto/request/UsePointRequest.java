@@ -1,10 +1,14 @@
-package com.hanaro.userservice.dto.Request;
+package com.hanaro.userservice.dto.request;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
-public class UsePointRequest {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UsePointRequest{
   int amount;
 }
