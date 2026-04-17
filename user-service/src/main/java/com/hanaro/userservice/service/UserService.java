@@ -70,7 +70,7 @@ public class UserService {
     }
 
     public UserMyPageResponseDTO getMyPageInfo(Long userId){
-      User user = userRepository.findById(userId).orElseThrow();
+      User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
       OrgMyPageResponseDTO orgDto = orgClient.getOrg();
 
       return UserMyPageResponseDTO.of(user, orgDto);
