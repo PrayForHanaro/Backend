@@ -15,6 +15,7 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
     apply plugin: 'io.freefair.lombok'
 
     java {
@@ -23,9 +24,24 @@ subprojects {
         }
     }
 
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
     dependencies {
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
+
+        // Testing
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.boot:spring-boot-data-jpa-test'
+        testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
+        testImplementation 'org.springframework.security:spring-security-test'
+        testImplementation 'org.springframework.boot:spring-boot-webmvc-test'
+        testImplementation 'org.springframework.boot:spring-boot-starter-json'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
 }
 

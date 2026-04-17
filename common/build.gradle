@@ -4,6 +4,7 @@ plugins {
 
 group = 'com.hanaro'
 version = '0.0.1-SNAPSHOT'
+description = 'common'
 
 java {
     toolchain {
@@ -11,11 +12,15 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    implementation 'org.springframework.security:spring-security-core:6.3.4'
-    implementation 'org.springframework:spring-web:6.1.14'
+    api 'org.springframework.boot:spring-boot-starter-security'
+    api 'org.springframework.boot:spring-boot-starter-web'
+
+    // MapStruct 추가
+    api 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    // Lombok과 MapStruct를 같이
+     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 }

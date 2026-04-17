@@ -24,7 +24,3 @@ spring:
   sql:
     init:
       mode: never
-
-feign:
-  circuitbreaker:
-    enabled: true
