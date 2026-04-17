@@ -1,8 +1,10 @@
 package com.hanaro.offeringservice.service;
 
+import com.hanaro.offeringservice.client.user.AccountClient;
 import com.hanaro.offeringservice.client.user.UserClient;
 import com.hanaro.offeringservice.domain.Offering;
 import com.hanaro.offeringservice.domain.OfferingType;
+import com.hanaro.offeringservice.dto.AccountWithdrawRequest;
 import com.hanaro.offeringservice.dto.OfferingRequestDTO;
 import com.hanaro.offeringservice.dto.UsePointRequest;
 import com.hanaro.offeringservice.dto.event.OfferingEvent;
@@ -11,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 @Service
@@ -18,6 +22,7 @@ import java.util.Arrays;
 public class OfferingService {
     private final OfferingRepository offeringRepository;
     private final UserClient userClient;
+    private final AccountClient accountClient;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
 
@@ -28,6 +33,11 @@ public class OfferingService {
                 .filter(o -> o.name().equals(request.getType()))
                 .findFirst()
                 .orElse(OfferingType.기타);
+
+        // 1. 계좌 잔액 차감 (Feign - 동기 방식)
+        // 잔액 부족 시 여기서 RuntimeException 발생 -> 트랜잭션 롤백
+        accountClient.withdraw(request.getAccountId(), 
+                new AccountWithdrawRequest(request.getAmount()));
 
         Offering offering = Offering.builder()
                 .userId(userId)
@@ -42,12 +52,12 @@ public class OfferingService {
 
         Long offeringId = offeringRepository.save(offering).getOfferingId();
 
-        // 1. 사용한 포인트가 있다면 user-service에 포인트 차감 요청 (Feign)
+        // 2. 사용한 포인트가 있다면 user-service에 포인트 차감 요청 (Feign)
         if (request.getUsedPoint().intValue() > 0) {
             userClient.usePoint(userId, new UsePointRequest(request.getUsedPoint().intValue()));
         }
 
-        // 2. Kafka 이벤트 발행 (포인트 적립 및 교회 총액 업데이트용)
+        // 3. Kafka 이벤트 발행 (포인트 적립 및 교회 총액 업데이트용)
         kafkaTemplate.send("offering-topic", OfferingEvent.builder()
                 .userId(userId)
                 .orgId(request.getOrgId())
@@ -59,3 +69,4 @@ public class OfferingService {
         return offeringId;
     }
 }
+

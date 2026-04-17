@@ -2,14 +2,9 @@ package com.hanaro.userservice.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
-/**
- * 계좌 정보
- * - 하나은행 여부 (is_hana): 헌금 기여율 계산에 사용
- * - 기본 계좌 (is_default): 헌금/증여 출금 기본값
- * - 적금 계좌 (is_savings): 기도적금/증여 입금 대상
- */
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -24,48 +19,43 @@ public class Account extends  BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long accountId;
 
-	/**  (같은 DB → FK 정상 사용) */
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = true) /** 자녀의 계좌일 경우 null 처리 */
-	private User user; //계좌 명의 주인
+	@JoinColumn(name = "user_id", nullable = true)
+	private User user;
 
-	/** 은행명 (예: 하나은행, 국민은행) */
 	@Column(nullable = false, length = 50)
 	private String bankName;
 
-	/** 계좌번호 */
 	@Column(nullable = false, unique = true, length = 30)
 	private String accountNumber;
 
-	/**
-	 * 하나은행 여부
-	 * true = 하나은행 → donation_rate 계산에 포함e => !!! bankname 으로 대신할까
-	 */
+	/** 잔액 */
+	@Column(nullable = false)
+	@Builder.Default
+	private BigDecimal balance = BigDecimal.ZERO;
+
 	@Column(nullable = false)
 	private boolean isHana;
 
-	/**
-	 * 기본 출금 계좌 여부
-	 * 헌금/증여 시 자동 선택되는 계좌
-	 */
 	@Column(nullable = false)
 	private boolean isDefault;
 
-	/**
-	 * 적금 계좌 여부
-	 * 기도적금/증여 입금 대상으로 선택 가능
-	 */
 	@Column(nullable = false)
 	private boolean isSavings;
 
-
-	/** 기본 계좌로 설정 */
 	public void setAsDefault() {
 		this.isDefault = true;
 	}
 
-	/** 기본 계좌 해제 */
 	public void unsetDefault() {
 		this.isDefault = false;
+	}
+
+	/** 잔액 차감 */
+	public void withdraw(BigDecimal amount) {
+		if (this.balance.compareTo(amount) < 0) {
+			throw new RuntimeException("Insufficient balance");
+		}
+		this.balance = this.balance.subtract(amount);
 	}
 }

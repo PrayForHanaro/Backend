@@ -34,6 +34,12 @@ dependencies {
 
     // Kafka 추가
     implementation 'org.springframework.kafka:spring-kafka'
+
+    // Lombok 추가
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
