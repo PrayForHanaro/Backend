@@ -23,5 +23,6 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
               "message": "권한이 없습니다."
             }
         """);
+        System.out.println("Access Denied: " + e.getMessage() + "");
     }
 }

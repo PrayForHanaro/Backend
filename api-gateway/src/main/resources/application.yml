@@ -42,3 +42,6 @@ downstream:
   prayer-service: http://prayer-service:8080
   user-service: http://user-service:8080
   org-service: http://org-service:8080
+
+jwt:
+  cookie-name: accessToken

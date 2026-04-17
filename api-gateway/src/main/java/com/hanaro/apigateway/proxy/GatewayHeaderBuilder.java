@@ -1,5 +1,7 @@
 package com.hanaro.apigateway.proxy;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,13 +23,18 @@ public class GatewayHeaderBuilder {
 
         Jwt jwt = jwtAuth.getToken();
 
-        String userId = jwt.getSubject();
+        String userId = jwt.getClaimAsString("userId");
         String userName = jwt.getClaimAsString("name");
-        String orgId = jwt.getClaimAsString("org_id");
+        String orgId = jwt.getClaimAsString("orgID");
         List<String> roles = jwt.getClaimAsStringList("roles");
 
+        // X-User-Name 헤더에 넣을 때
+        String encodedName = Base64.getEncoder().encodeToString(
+                userName.getBytes(StandardCharsets.UTF_8)
+        );
+
         headers.set("X-User-Id", userId);
-        headers.set("X-User-Name", userName != null ? userName : "");
+        headers.set("X-User-Name", encodedName != null ? encodedName : "");
         headers.set("X-Org-Id", orgId != null ? orgId : "");
         headers.set("X-User-Role", String.join(",", roles != null ? roles : Collections.emptyList()));
 

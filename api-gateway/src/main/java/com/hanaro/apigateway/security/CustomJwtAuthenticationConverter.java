@@ -25,7 +25,7 @@ public class CustomJwtAuthenticationConverter
                                 .map(r -> r.startsWith("ROLE_") ? r : "ROLE_" + r)
                                 .map(r -> (GrantedAuthority) new SimpleGrantedAuthority(r))
                                 .toList();
-
+        System.out.println("CustomJwtAuthenticationConverter: " + authorities + "");
         return new JwtAuthenticationToken(jwt, authorities, jwt.getSubject());
     }
 }
