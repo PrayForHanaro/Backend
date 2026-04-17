@@ -1,6 +1,6 @@
 spring:
   config:
-    import: optional:classpath:security.yml
+    import: classpath:security.yml
 
   profiles:
     active: local

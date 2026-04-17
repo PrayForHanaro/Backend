@@ -18,10 +18,6 @@ repositories {
     mavenCentral()
 }
 
-bootJar {
-    archiveFileName = 'app.jar'
-}
-
 ext {
     set('springCloudVersion', "2025.1.1")
 }
