@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OfferingController {
     private final OfferingService offeringService;
 
-    @PostMapping
+    @PostMapping("/once")
     public ApiResponse<Long> registerOffering(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody OfferingRequestDTO request) {
