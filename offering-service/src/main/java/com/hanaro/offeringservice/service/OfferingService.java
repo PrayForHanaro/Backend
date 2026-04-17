@@ -67,6 +67,8 @@ public class OfferingService {
                 .build());
 
         return offeringId;
+        userClient.usePoint(new UsePointRequest(request.getPoint()));
+        return offeringRepository.save(offering).getOfferingId();
     }
 }
 

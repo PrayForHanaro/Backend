@@ -7,3 +7,8 @@ spring:
 storage:
   type: local
   upload-dir: uploads/
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://activity-db:3306/activity_db
+    username: root
+    password: root

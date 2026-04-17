@@ -6,11 +6,7 @@ spring:
     active: local
   application:
     name: org-service
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://org-db:3306/org_db
-    username: root
-    password: root
+
   jpa:
     hibernate:
       ddl-auto: update

@@ -24,7 +24,9 @@ public class InternalUserController {
       @PathVariable Long userId,
       @RequestBody UsePointRequest request
   ) {
-    userService.usePoint(userId, request);
+    userService.usePoint(user.getUserId(), request);
+    System.out.println("deploy test v2");
     return ResponseEntity.ok().build();
   }
+
 }
