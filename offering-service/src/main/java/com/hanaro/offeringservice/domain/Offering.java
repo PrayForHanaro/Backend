@@ -52,4 +52,7 @@ public class Offering extends BaseEntity{
 	/** 기도제목 (최대 250자, 선택) */
 	@Column(length = 250)
 	private String prayerContent;
+
+	/** 사용한 포인트 (0일 수 있음) */
+	private BigDecimal usedPoint;
 }
