@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class PointService {
-  PointRepository pointRepository;
+  private final PointRepository pointRepository;
 
   @Transactional(readOnly = true)
   public PageResponseDTO<PointResponseDTO> getPointList(Long userId, Pageable pageable) {
