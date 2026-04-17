@@ -10,44 +10,6 @@ spring:
 
   cloud:
     gateway:
-      server:
-        webmvc:
-          routes:
-            - id: offering-service
-              uri: http://localhost:8081
-              predicates:
-                - Path=/api/offerings/**
-              filters:
-                - StripPrefix=1
-
-            - id: activity-service
-              uri: http://localhost:8082
-              predicates:
-                - Path=/api/activities/**
-              filters:
-                - StripPrefix=1
-
-            - id: prayer-service
-              uri: http://localhost:8083
-              predicates:
-                - Path=/api/prayers/**
-              filters:
-                - StripPrefix=1
-
-            - id: user-service
-              uri: http://localhost:8084
-              predicates:
-                - Path=/api/users/**
-              filters:
-                - StripPrefix=1
-
-            - id: org-service
-              uri: http://localhost:8085
-              predicates:
-                - Path=/api/orgs/**
-              filters:
-                - StripPrefix=1
-
       globalcors:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
@@ -73,3 +35,10 @@ management:
     web:
       exposure:
         include: health,info
+
+downstream:
+  offering-service: http://offering-service:8080
+  activity-service: http://activity-service:8080
+  prayer-service: http://prayer-service:8080
+  user-service: http://user-service:8080
+  org-service: http://org-service:8080
