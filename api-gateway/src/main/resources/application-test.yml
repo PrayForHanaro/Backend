@@ -27,7 +27,7 @@ spring:
         - id: org-service
           uri: http://localhost:8085/
           predicates:
-            - Path=/users/**
+            - Path=/orgs/**
       globalcors:
         cors-configurations:
           '[/**]':
