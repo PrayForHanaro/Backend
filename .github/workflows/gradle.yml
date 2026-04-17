@@ -1,13 +1,10 @@
-name: Financial Service CI
+name: Financial Service CI/CD
 
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
 
 jobs:
-  # [STEP 1] 변경된 모듈 감지
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
@@ -69,8 +66,7 @@ jobs:
               - 'gradlew'
               - 'gradle/wrapper/**'
 
-  # [STEP 2] 변경된 모듈만 빌드 + Docker 이미지 생성 확인
-  build-and-docker:
+  build-and-push:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.modules != '[]' }}
     runs-on: ubuntu-latest
@@ -96,9 +92,60 @@ jobs:
       - name: Build module
         run: ./gradlew :${{ matrix.module }}:build -x test
 
-      - name: Build Docker image
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        working-directory: ./${{ matrix.module }}
         run: |
           docker build \
-            -f ./${{ matrix.module }}/Dockerfile \
-            -t ${{ matrix.module }}:ci-test \
-            ./${{ matrix.module }}
+            -f Dockerfile \
+            -t $ECR_REGISTRY/${{ matrix.module }}:$IMAGE_TAG \
+            -t $ECR_REGISTRY/${{ matrix.module }}:latest \
+            .
+
+          docker push $ECR_REGISTRY/${{ matrix.module }}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/${{ matrix.module }}:latest
+
+  deploy:
+    needs: [detect-changes, build-and-push]
+    if: ${{ needs.detect-changes.outputs.modules != '[]' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            echo "==== ECR Login ===="
+            aws ecr get-login-password --region ap-northeast-2 | \
+            docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com
+
+            echo "==== Move to project directory ===="
+            cd ~/project
+
+            echo "==== Deploy changed services only ===="
+            CHANGED='${{ needs.detect-changes.outputs.modules }}'
+
+            for service in $(echo "$CHANGED" | jq -r '.[]'); do
+              echo "Deploying $service"
+              docker-compose pull $service
+              docker-compose up -d --no-deps $service
+            done
+
+            echo "==== Remove unused containers ===="
+            docker system prune -f
