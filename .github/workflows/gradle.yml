@@ -101,4 +101,4 @@ jobs:
           docker build \
             -f ./${{ matrix.module }}/Dockerfile \
             -t ${{ matrix.module }}:ci-test \
-            .
+            ./${{ matrix.module }}
