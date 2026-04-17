@@ -36,21 +36,4 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public void processPoints(Long userId, int amount, Long refId, PointType pointType, boolean isEarn) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        int finalAmount = isEarn 
-                ? (int) (amount * user.getDonationRate()) // 줄 때, 받을 때 전부 0.01 처럼 소수로 받음
-                : amount;
-
-        Point point = Point.builder()
-                .user(user)
-                .amount(isEarn ? finalAmount : -finalAmount)
-                .pointType(pointType)
-                .refId(refId)
-                .build();
-        pointRepository.save(point);
-    }
 }
