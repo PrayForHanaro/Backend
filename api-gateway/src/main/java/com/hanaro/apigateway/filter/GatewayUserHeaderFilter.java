@@ -1,5 +1,7 @@
 package com.hanaro.apigateway.filter;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -56,7 +58,10 @@ public class GatewayUserHeaderFilter {
                     headers.set("X-User-Id", userId);
                 }
                 if (userName != null) {
-                    headers.set("X-User-Name", userName);
+                    String encodedName = Base64.getEncoder().encodeToString(
+                            userName.getBytes(StandardCharsets.UTF_8)
+                    );
+                    headers.set("X-User-Name", encodedName);
                 }
                 if (orgId != null) {
                     headers.set("X-Org-Id", orgId);
