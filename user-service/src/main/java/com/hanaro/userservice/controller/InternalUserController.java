@@ -18,12 +18,12 @@ public class InternalUserController {
 
   private final UserService userService;
 
-  @PostMapping("/points/use")
+  @PostMapping("/{userId}/points/use")
   public ResponseEntity<Void> usePoint(
-      @AuthenticationPrincipal CustomUserDetails user,
+      @PathVariable Long userId,
       @RequestBody UsePointRequest request
   ) {
-    userService.usePoint(user.getUserId(), request);
+    userService.usePoint(userId, request);
     return ResponseEntity.ok().build();
   }
 }

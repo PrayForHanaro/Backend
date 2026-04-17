@@ -1,8 +1,10 @@
 package com.hanaro.offeringservice.service;
 
+import com.hanaro.offeringservice.client.user.UserClient;
 import com.hanaro.offeringservice.domain.Offering;
 import com.hanaro.offeringservice.domain.OfferingType;
 import com.hanaro.offeringservice.dto.OfferingRequestDTO;
+import com.hanaro.offeringservice.dto.UsePointRequest;
 import com.hanaro.offeringservice.repository.OfferingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class OfferingService {
     private final OfferingRepository offeringRepository;
+    private final UserClient userClient;
+
 
     @Transactional
     public Long registerOffering(Long userId, OfferingRequestDTO request) {
@@ -34,6 +38,13 @@ public class OfferingService {
                 .prayerContent(request.getPrayerTopic())
                 .build();
 
-        return offeringRepository.save(offering).getOfferingId();
+        Long offeringId = offeringRepository.save(offering).getOfferingId();
+
+        // 사용한 포인트가 있다면 user-service에 포인트 차감 요청 (Feign)
+        if (request.getUsedPoint() > 0) {
+            userClient.usePoint(userId, new UsePointRequest(request.getUsedPoint().intValue()));
+        }
+
+        return offeringId;
     }
 }
