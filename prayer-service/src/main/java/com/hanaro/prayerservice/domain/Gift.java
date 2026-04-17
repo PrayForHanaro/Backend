@@ -37,7 +37,7 @@ public class Gift extends BaseEntity {
 	@Column(name = "receiver_id", nullable = false)
 	private Long receiverId;
 
-	/** 대상자와의 관계 (자녀/손주/증손주) */
+	/** 대상자와의 관계 (아들/딸/손주) */
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private GiftReceiverType giftReceiverType;
