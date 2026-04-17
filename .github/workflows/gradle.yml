@@ -143,8 +143,8 @@ jobs:
 
             for service in $(echo "$CHANGED" | jq -r '.[]'); do
               echo "Deploying $service"
-              docker compose pull $service
-              docker compose up -d --no-deps $service
+              docker-compose pull $service
+              docker-compose up -d --no-deps $service
             done
 
             echo "==== Remove unused containers ===="
