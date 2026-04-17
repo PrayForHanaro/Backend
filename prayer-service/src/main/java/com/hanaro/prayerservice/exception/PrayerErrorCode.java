@@ -1,0 +1,35 @@
+package com.hanaro.prayerservice.exception;
+
+import com.hanaro.common.exception.ErrorCode;
+import lombok.Getter;
+
+/**
+ * prayer-service 에러 코드.
+ * 프리픽스 P + 3자리. 도메인별 100단위 밴드 (ADR-006 예정).
+ *   P0xx: Gift (정기 송금 설정)
+ *   P1xx: PrayerSavings (기도 메시지)
+ *   P2xx: OnceTransfer (일회성 축복)
+ *   P3xx: Savings (적금 가입)
+ */
+@Getter
+public enum PrayerErrorCode implements ErrorCode {
+
+    GIFT_NOT_FOUND("P001", "기도적금을 찾을 수 없습니다", 404),
+    GIFT_NOT_OWNED("P002", "기도적금 접근 권한이 없습니다", 403),
+
+    MESSAGE_NOT_FOUND("P101", "기도 메시지를 찾을 수 없습니다", 404),
+    MESSAGE_NOT_OWNED("P102", "메시지 수정 권한이 없습니다", 403),
+    MESSAGE_CONTENT_INVALID("P103", "메시지 내용이 유효하지 않습니다", 400),
+
+    ONCE_AMOUNT_INVALID("P201", "축복 금액이 유효하지 않습니다", 400);
+
+    private final String code;
+    private final String message;
+    private final int status;
+
+    PrayerErrorCode(String code, String message, int status) {
+        this.code = code;
+        this.message = message;
+        this.status = status;
+    }
+}
