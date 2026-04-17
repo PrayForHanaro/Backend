@@ -24,6 +24,7 @@ public enum PrayerErrorCode implements ErrorCode {
     MESSAGE_CONTENT_INVALID("P103", "메시지 내용이 유효하지 않습니다", 400),
 
     ONCE_AMOUNT_INVALID("P201", "축복 금액이 유효하지 않습니다", 400),
+    TRANSFER_FAILED("P202", "송금 처리 중 오류가 발생했습니다", 500),
 
     SAVINGS_PRODUCT_NOT_FOUND("P301", "적금 상품을 찾을 수 없습니다", 404);
 
