@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: offering-service-test
+    name: prayer-service-test
 
   datasource:
     url: jdbc:h2:mem:testdb

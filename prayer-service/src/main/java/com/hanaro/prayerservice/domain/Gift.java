@@ -3,38 +3,43 @@ package com.hanaro.prayerservice.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 증여 자동이체 설정
- * - 매달 지정된 사람의 적금계좌에 자동이체
- * - 대상이 여러 명일 수 있음 (Gift 여러 개 생성)
- * - 메시지는 GiftLog에 날짜별 기록
+ * 기도적금 자동이체 설정 (정기)
+ * - 매달 지정된 날짜에 대상자 적금계좌로 자동이체
+ * - 한 사용자가 여러 대상자에게 보낼 때 Gift 여러 개 생성
+ * - 대상자 1명당 적금 1건 (BLESS_SPEC §10-8, decisions/003 → unique constraint)
+ * - 대상자는 가입자 한정 (decisions/003). receiverId nullable=false
+ * - 메시지는 PrayerSavings, 이체 로그는 GiftTransfer에 별도 저장
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "GIFT")
+@Table(
+    name = "GIFT",
+    uniqueConstraints = @UniqueConstraint(name = "uq_gift_sender_receiver", columnNames = {"sender_id", "receiver_id"})
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class Gift extends  BaseEntity {
+public class Gift extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(columnDefinition = "int unsigned")
 	private Long giftId;
 
 	/** 보내는 사람 ID (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "sender_id", nullable = false)
 	private Long senderId;
 
-	/** 받는 사람 ID (user_db 참조, FK 없음) */
-	@Column(nullable = true) /** 가입하지 않은 사용자에게 보낼 경우 null 처리 */
+	/** 받는 사람 ID (user_db 참조, FK 없음). 가입자 한정 (decisions/003) */
+	@Column(name = "receiver_id", nullable = false)
 	private Long receiverId;
 
+	/** 대상자와의 관계 (자녀/손주/증손주) */
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 20)
 	private GiftReceiverType giftReceiverType;
 
 	/** 출금 계좌 ID - 나의 대표 헌금계좌 (user_db 참조, FK 없음) */
@@ -49,11 +54,19 @@ public class Gift extends  BaseEntity {
 	@Column(nullable = false)
 	private BigDecimal amount;
 
+	/** 매달 이체 실행일 (1~31) (BLESS_SPEC §6-4) */
+	@Column(nullable = false)
+	private int transferDay;
+
+	/** 기도 목표 기간 (일). 기본 365 (BLESS_SPEC §10 — 사용자 입력, Mock) */
+	@Column(nullable = false)
+	private int goalDays;
+
 	/** 자동이체 활성화 여부 */
 	@Column(nullable = false)
 	private boolean isActive;
 
-	/** 이 시점까지의 누적 송금 총액 */
+	/** 이 시점까지의 누적 송금 총액 (캐싱, SUCCESS 합계로 갱신) */
 	@Column(nullable = false)
 	private BigDecimal cumulativeTotal;
 
@@ -65,7 +78,6 @@ public class Gift extends  BaseEntity {
 	@Column(nullable = false)
 	private BigDecimal interestRate;
 
-
 	@OneToMany(mappedBy = "gift", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<PrayerSavings> prayerSavings = new ArrayList<>();
@@ -75,13 +87,15 @@ public class Gift extends  BaseEntity {
 		this.isActive = true;
 	}
 
-	/** 자동이체 비활성화 */
 	public void deactivate() {
 		this.isActive = false;
 	}
 
-	/** 자동이체 금액 변경 */
 	public void updateAmount(BigDecimal amount) {
 		this.amount = amount;
+	}
+
+	public void addCumulativeTotal(BigDecimal delta) {
+		this.cumulativeTotal = this.cumulativeTotal.add(delta);
 	}
 }
