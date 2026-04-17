@@ -29,7 +29,7 @@ public class PrayerSavings extends BaseEntity {
 	private Long prayerSavingsId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "gift", referencedColumnName = "id",
+	@JoinColumn(name = "gift", referencedColumnName = "giftId",
 		columnDefinition = "int unsigned",
 		foreignKey = @ForeignKey(name = "fk_Prayer_Savings_Gift"))
 	@OnDelete(action = OnDeleteAction.CASCADE)
