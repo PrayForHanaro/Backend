@@ -1,4 +1,4 @@
-package com.hanaro.userservice.dto.Request;
+package com.hanaro.userservice.dto.request;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
