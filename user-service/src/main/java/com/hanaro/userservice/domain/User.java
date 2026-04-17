@@ -1,5 +1,6 @@
 package com.hanaro.userservice.domain;
 
+import com.hanaro.common.auth.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;

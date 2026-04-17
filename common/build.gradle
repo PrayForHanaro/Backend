@@ -4,7 +4,6 @@ plugins {
 
 group = 'com.hanaro'
 version = '0.0.1-SNAPSHOT'
-description = 'common'
 
 java {
     toolchain {
@@ -12,7 +11,11 @@ java {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    api 'org.springframework.boot:spring-boot-starter-security'
-    api 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.security:spring-security-core:6.3.4'
+    implementation 'org.springframework:spring-web:6.1.14'
 }
