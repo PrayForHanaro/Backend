@@ -21,7 +21,9 @@ public enum PrayerErrorCode implements ErrorCode {
     MESSAGE_NOT_OWNED("P102", "메시지 수정 권한이 없습니다", 403),
     MESSAGE_CONTENT_INVALID("P103", "메시지 내용이 유효하지 않습니다", 400),
 
-    ONCE_AMOUNT_INVALID("P201", "축복 금액이 유효하지 않습니다", 400);
+    ONCE_AMOUNT_INVALID("P201", "축복 금액이 유효하지 않습니다", 400),
+
+    SAVINGS_PRODUCT_NOT_FOUND("P301", "적금 상품을 찾을 수 없습니다", 404);
 
     private final String code;
     private final String message;

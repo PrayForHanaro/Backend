@@ -37,7 +37,9 @@ public class SecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/apis/prayer/admin/**").hasRole("ADMIN")
+                    .anyRequest().permitAll())
             .addFilterBefore(new PreAuthenticatedUserFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
