@@ -22,4 +22,5 @@ dependencies {
     // Lombok과 MapStruct를 같이
      annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
-    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1'}
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+}

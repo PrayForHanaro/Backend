@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.hanaro'
+version = '0.0.1-SNAPSHOT'
+description = 'api-gateway'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+bootJar {
+    archiveFileName = 'app.jar'
+}
+
+ext {
+    set('springCloudVersion', "2025.1.1")
+}
+
+dependencies {
+    // Spring MVC 기반 Gateway
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway-server-webmvc'
+
+    // 보안 필터 체인
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JWT 검증용
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    // 헬스체크, 운영 확인
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

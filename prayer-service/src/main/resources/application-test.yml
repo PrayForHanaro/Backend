@@ -1,5 +1,5 @@
 server:
-  port: 0   # 랜덤 포트 (충돌 방지)
+  port: 8083   # 랜덤 포트 (충돌 방지)
 
 spring:
   application:
@@ -23,3 +23,7 @@ spring:
 
   kafka:
     enabled: false   # Kafka 완전 비활성화
+
+feign:
+  circuitbreaker:
+    enabled: false   # 테스트에서는 필요 없음

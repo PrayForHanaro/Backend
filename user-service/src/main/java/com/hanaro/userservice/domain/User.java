@@ -1,5 +1,6 @@
 package com.hanaro.userservice.domain;
 
+import com.hanaro.common.auth.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -43,9 +44,8 @@ public class User extends BaseEntity {
 	@Column(nullable = false, unique = true, length = 20)
 	private String phone;
 
-	@Column(nullable = false, length = 255)
+	@Column(nullable = false)
 	private String password;
-
 	/**
 	 * 역할
 	 * ex 일반 / 집사 / 권사 / 목사 / 관리자
@@ -90,10 +90,11 @@ public class User extends BaseEntity {
 	@PrePersist
 	protected void onCreate() {
 		this.donationRate = 0.0;
-		this.role = UserRole.일반사용자;
+        this.role = UserRole.USER;
 		if (this.imageType == null) {
 			this.imageType = "man";
 		}
+
 	}
 
 	/** 기본 계좌 변경 */
