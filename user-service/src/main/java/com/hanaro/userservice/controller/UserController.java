@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hanaro.common.response.ApiResponse;
 import com.hanaro.common.security.CustomUserDetails;
-import com.hanaro.userservice.dto.UserGivingResponseDTO;
-import com.hanaro.userservice.dto.UserHomeResponseDTO;
-import com.hanaro.userservice.dto.UserSimpleResponseDTO;
+import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
+import com.hanaro.userservice.dto.response.UserHomeResponseDTO;
+import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
 // import com.hanaro.userservice.domain.PointType;
 import com.hanaro.userservice.service.UserService;
 
@@ -66,5 +66,4 @@ public class UserController {
 	) {
 		return userService.getMyPageInfo(user.getUserId());
 	}
-
 }

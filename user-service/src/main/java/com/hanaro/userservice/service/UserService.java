@@ -1,6 +1,8 @@
 package com.hanaro.userservice.service;
 
 import com.hanaro.userservice.client.OrgClient;
+import com.hanaro.userservice.domain.PointType;
+import com.hanaro.userservice.dto.event.PointEvent;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
 import com.hanaro.userservice.dto.request.UsePointRequest;
 import com.hanaro.userservice.dto.response.OrgMyPageResponseDTO;
@@ -24,71 +26,115 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-  private final UserRepository userRepository;
-  private final PointRepository pointRepository;
-  private final UserMapper userMapper;
-  private final OrgClient orgClient;
-  private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PointRepository pointRepository;
+    private final UserMapper userMapper;
+    private final OrgClient orgClient;
+    private final PasswordEncoder passwordEncoder;
 
-  @Transactional
-  public void signUp(SignUpRequestDTO request) {
+    @Transactional
+    public void signUp(SignUpRequestDTO request) {
 
-      if (userRepository.existsByPhone(request.getPhoneNumber())) {
-        throw new IllegalArgumentException("이미 가입된 번호입니다.");
+        if (userRepository.existsByPhone(request.getPhoneNumber())) {
+          throw new IllegalArgumentException("이미 가입된 번호입니다.");
+        }
+
+        // 비밀번호 해시
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        User user = User.builder()
+            .name(request.getName())
+            .birthDate(request.getBirth())
+            .phone(request.getPhoneNumber())
+            .password(encodedPassword)
+            .build();
+
+        userRepository.save(user);
       }
 
-      // 비밀번호 해시
-      String encodedPassword = passwordEncoder.encode(request.getPassword());
+      public UserHomeResponseDTO getHomeInfo(Long userId) {
+          User user = userRepository.findById(userId)
+                  .orElseThrow(() -> new RuntimeException("User not found"));
+          return userMapper.toUserHomeResponseDTO(user);
+      }
 
-      User user = User.builder()
-          .name(request.getName())
-          .birthDate(request.getBirth())
-          .phone(request.getPhoneNumber())
-          .password(encodedPassword)
-          .build();
+      public UserGivingResponseDTO getGivingInfo(Long userId) {
+          User user = userRepository.findById(userId)
+                  .orElseThrow(() -> new RuntimeException("User not found"));
+          return userMapper.toUserGivingResponseDTO(user);
+      }
 
-      userRepository.save(user);
+      public List<UserSimpleResponseDTO> getUserList(List<Long> ids) {
+          return userRepository.findAllById(ids).stream()
+                  .map(userMapper::toUserSimpleResponseDTO)
+                  .collect(Collectors.toList());
+      }
+
+    public UserMyPageResponseDTO getMyPageInfo(Long userId){
+      User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+      OrgMyPageResponseDTO orgDto = orgClient.getOrg();
+
+      return UserMyPageResponseDTO.of(user, orgDto);
     }
 
-    public UserHomeResponseDTO getHomeInfo(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return userMapper.toUserHomeResponseDTO(user);
+    @Transactional
+    public void usePoint(Long userId, UsePointRequest request) {
+
+      User user = userRepository.findById(userId).orElseThrow();
+
+      user.minusPoint(request.getAmount());
+
+      Point point = Point.usePoint(user, request.getAmount());
+
+      pointRepository.save(point);
     }
 
-    public UserGivingResponseDTO getGivingInfo(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return userMapper.toUserGivingResponseDTO(user);
+    public int getPointSum(Long userId){
+      User user = userRepository.findById(userId).orElseThrow();
+      return user.getPointSum();
     }
 
-    public List<UserSimpleResponseDTO> getUserList(List<Long> ids) {
-        return userRepository.findAllById(ids).stream()
-                .map(userMapper::toUserSimpleResponseDTO)
-                .collect(Collectors.toList());
-    }
-
-  public UserMyPageResponseDTO getMyPageInfo(Long userId){
-    User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-    OrgMyPageResponseDTO orgDto = orgClient.getOrg();
-
-    return UserMyPageResponseDTO.of(user, orgDto);
-  }
-
+    //카프카 처리
   @Transactional
-  public void usePoint(Long userId, UsePointRequest request) {
+  public void processPoint(PointEvent event) {
 
-    User user = userRepository.findById(userId).orElseThrow();
+    User user = userRepository.findById(event.getUserId())
+        .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
 
-    user.minusPoint(request.getAmount());
+    Point point;
 
-    Point point = Point.usePoint(user, request.getAmount());
+    switch (PointType.valueOf(event.getPointType())) {
+
+      case OFFERING_ONCE -> point =
+          Point.createOfferingOnce(
+              user,
+              user.getDonationRate(),
+              event.getAmount(),
+              event.getTitle()
+          );
+
+      case ACTIVITY_VOLUNTEER -> point =
+          Point.createActivityVolunteer(user, event.getTitle());
+
+      case ACTIVITY_CHURCH -> point =
+          Point.createActivityChurch(user, event.getTitle());
+
+      case SAVINGS_JOIN -> point =
+          Point.createSavingsJoin(
+              user,
+              event.getProductName(),
+              event.getTargetName()
+          );
+
+      case SAVINGS_RECURRING -> point =
+          Point.createSavingsRecurring(user, event.getTargetName());
+
+      default -> throw new IllegalArgumentException("지원하지 않는 타입");
+    }
 
     pointRepository.save(point);
+
+    user.addPoint(point.getAmount());
   }
 
-  public int getPointSum(Long userId){
-    User user = userRepository.findById(userId).orElseThrow();
-    return user.getPointSum();
-    }
 }

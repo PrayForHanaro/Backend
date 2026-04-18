@@ -11,7 +11,6 @@ import com.hanaro.offeringservice.dto.event.OfferingEvent;
 import com.hanaro.offeringservice.repository.OfferingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +54,7 @@ public class OfferingService {
 
         // 2. 사용한 포인트가 있다면 user-service에 포인트 차감 요청 (Feign)
         if (request.getUsedPoint().intValue() > 0) {
-            userClient.usePoint(userId, new UsePointRequest(request.getUsedPoint().intValue()));
+            userClient.usePoint(new UsePointRequest(request.getUsedPoint().intValue()));
         }
 
         // 3. Kafka 이벤트 발행 (포인트 적립 및 교회 총액 업데이트용)

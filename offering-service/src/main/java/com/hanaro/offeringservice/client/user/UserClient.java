@@ -7,9 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
     name = "user-service",
+    contextId = "userClient",
     url = "http://user-service:8080"
 )
-public class UserClient {
+public interface UserClient {
   @PostMapping("/internal/users/points/use")
   void usePoint(@RequestBody UsePointRequest request);
 }

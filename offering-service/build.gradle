@@ -29,6 +29,8 @@ dependencies {
 
     // Kafka 추가
     implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation "org.testcontainers:kafka"
 
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:5.0.1'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1'

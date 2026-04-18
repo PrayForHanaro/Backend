@@ -4,3 +4,4 @@ spring:
     url: jdbc:mysql://offering-db:3306/offering_db
     username: root
     password: root
+
