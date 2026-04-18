@@ -1,5 +1,7 @@
 package com.hanaro.userservice.domain;
 
+import com.hanaro.common.exception.BaseException;
+import com.hanaro.userservice.exception.UserErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -54,7 +56,7 @@ public class Account extends  BaseEntity {
 	/** 잔액 차감 */
 	public void withdraw(BigDecimal amount) {
 		if (this.balance.compareTo(amount) < 0) {
-			throw new RuntimeException("Insufficient balance");
+			throw new BaseException(UserErrorCode.INSUFFICIENT_BALANCE);
 		}
 		this.balance = this.balance.subtract(amount);
 	}

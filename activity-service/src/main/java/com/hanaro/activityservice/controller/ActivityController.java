@@ -26,52 +26,44 @@ public class ActivityController {
 
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ActivityResponse.Summary>>> getActivities(
+    public ApiResponse<List<ActivityResponse.Summary>> getActivities(
         @RequestHeader(value = "X-Auth-User-Id", required = false) Long userId,
         @RequestHeader(value = "X-Auth-Org-Id", required = false) Long orgId,
         @RequestParam(value = "category", required = false) String category,
         @RequestParam(value = "keyword", required = false) String keyword
     ) {
-        return ResponseEntity.ok(
-            ApiResponse.ok(activityService.getActivities(userId, orgId, category, keyword))
-        );
+        return ApiResponse.ok(activityService.getActivities(userId, orgId, category, keyword));
     }
 
     @GetMapping("/{activityId}")
-    public ResponseEntity<ApiResponse<ActivityResponse.Detail>> getActivity(
+    public ApiResponse<ActivityResponse.Detail> getActivity(
         @PathVariable("activityId") Long activityId,
         @RequestHeader(value = "X-Auth-User-Id", required = false) Long userId
     ) {
-        return ResponseEntity.ok(
-            ApiResponse.ok(activityService.getActivity(activityId, userId))
-        );
+        return ApiResponse.ok(activityService.getActivity(activityId, userId));
     }
 
     @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<ApiResponse<ActivityResponse.Detail>> createActivity(
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<ActivityResponse.Detail> createActivity(
         @RequestHeader(value = "X-Auth-User-Id", required = false) Long userId,
         @RequestHeader(value = "X-Auth-Org-Id", required = false) Long orgId,
         @RequestPart("request") ActivityRequest request,
         @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            ApiResponse.ok("활동 등록이 완료되었습니다.", activityService.createActivity(userId, orgId, request, files))
-        );
+        return ApiResponse.ok("활동 등록이 완료되었습니다.", activityService.createActivity(userId, orgId, request, files));
     }
 
     @PostMapping("/{activityId}/apply")
-    public ResponseEntity<ApiResponse<ActivityResponse.Detail>> applyActivity(
+    public ApiResponse<ActivityResponse.Detail> applyActivity(
         @PathVariable("activityId") Long activityId,
         @RequestHeader(value = "X-Auth-User-Id", required = false) Long userId
     ) {
-        return ResponseEntity.ok(
-            ApiResponse.ok("활동 참여가 완료되었습니다.", activityService.applyActivity(activityId, userId))
-        );
+        return ApiResponse.ok("활동 참여가 완료되었습니다.", activityService.applyActivity(activityId, userId));
     }
 
     @PostMapping("/upload")
     public ApiResponse<String> uploadPhoto(
-        @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestPart("file") MultipartFile file
     ) {
         String url = storageService.upload(file, "activity");

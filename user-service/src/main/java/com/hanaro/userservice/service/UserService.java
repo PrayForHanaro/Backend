@@ -1,18 +1,14 @@
 package com.hanaro.userservice.service;
 
 import com.hanaro.userservice.domain.*;
-import com.hanaro.userservice.dto.*;
 import com.hanaro.userservice.dto.request.UsePointRequest;
 import com.hanaro.userservice.client.OrgClient;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
-import com.hanaro.userservice.dto.request.UsePointRequest;
 import com.hanaro.userservice.dto.response.OrgMyPageResponseDTO;
 import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
 import com.hanaro.userservice.dto.response.UserHomeResponseDTO;
 import com.hanaro.userservice.dto.response.UserMyPageResponseDTO;
 import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
-import com.hanaro.userservice.domain.Point;
-import com.hanaro.userservice.domain.User;
 
 import com.hanaro.userservice.mapper.UserMapper;
 import com.hanaro.userservice.repository.PointRepository;
@@ -20,7 +16,6 @@ import com.hanaro.userservice.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -96,6 +91,13 @@ public class UserService {
     public int getPointSum(Long userId){
         User user = userRepository.findById(userId).orElseThrow();
         return user.getPointSum();
+    }
+
+    @Transactional
+    public void updateProfileImage(Long userId, String profileUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        user.updateProfileUrl(profileUrl);
     }
 
 }
