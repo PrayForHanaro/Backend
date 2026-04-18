@@ -61,6 +61,7 @@ public class S3StorageService implements StorageService {
 
     @Override
     public String getPresignedUrl(String key) {
+        if (key == null || key.isEmpty()) return null;
         return s3Presigner.presignGetObject(req -> req
             .signatureDuration(Duration.ofHours(1))
             .getObjectRequest(gor -> gor

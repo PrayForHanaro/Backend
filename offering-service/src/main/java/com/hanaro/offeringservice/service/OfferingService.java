@@ -34,11 +34,7 @@ public class OfferingService {
                 .findFirst()
                 .orElse(OfferingType.기타);
 
-        // 1. 계좌 잔액 차감 (Feign - 동기 방식)
-        // 잔액 부족 시 여기서 RuntimeException 발생 -> 트랜잭션 롤백
-        accountClient.withdraw(request.getAccountId(), 
-                new AccountWithdrawRequest(request.getAmount()));
-
+        // 1. 헌금 정보 빌드 및 로컬 DB 저장
         Offering offering = Offering.builder()
                 .userId(userId)
                 .orgId(request.getOrgId())
@@ -51,6 +47,11 @@ public class OfferingService {
                 .build();
 
         Long offeringId = offeringRepository.save(offering).getOfferingId();
+
+        // 2. 계좌 잔액 차감 (Feign - 동기 방식)
+        // 로컬 DB 저장 성공 후 호출. 외부 서비스 예외 시 트랜잭션 롤백됨.
+        accountClient.withdraw(request.getAccountId(), 
+                new AccountWithdrawRequest(request.getAmount()));
 
         // 2. 사용한 포인트가 있다면 user-service에 포인트 차감 요청 (Feign)
         if (request.getUsedPoint().intValue() > 0) {

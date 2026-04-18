@@ -3,6 +3,7 @@ package com.hanaro.userservice.storage;
 import com.hanaro.common.exception.BaseException;
 import com.hanaro.common.exception.GlobalErrorCode;
 import com.hanaro.common.storage.StorageService;
+import com.hanaro.userservice.exception.UserErrorCode;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -42,7 +43,7 @@ public class S3StorageService implements StorageService {
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize())
             );
         } catch (IOException e) {
-            throw new BaseException(GlobalErrorCode.INTERNAL_SERVER_ERROR); // 적절한 에러코드가 없어 Global 사용
+            throw new BaseException(UserErrorCode.FILE_UPLOAD_FAILED);
         }
 
         return key;
