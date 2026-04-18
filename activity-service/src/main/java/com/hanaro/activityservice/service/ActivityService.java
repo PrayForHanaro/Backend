@@ -87,9 +87,14 @@ public class ActivityService {
         } catch (Exception e) {
             // [보상 조치] DB 저장 실패 시 S3에 업로드된 파일 삭제
             for (String imageUrl : imageUrls) {
-                storageService.delete(imageUrl);
+                try {
+                    storageService.delete(imageUrl);
+                } catch (Exception ex) {
+                    // 개별 삭제 실패 시 로그만 남기고 다음 파일 삭제 시도
+                    System.err.println("Failed to delete orphaned file: " + imageUrl + ", error: " + ex.getMessage());
+                }
             }
-            throw e; // 예외 전파
+            throw e; // 원본 예외 전파
         }
     }
 

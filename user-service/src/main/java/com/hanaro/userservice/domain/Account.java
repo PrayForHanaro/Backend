@@ -45,6 +45,9 @@ public class Account extends  BaseEntity {
 	@Column(nullable = false)
 	private boolean isSavings;
 
+	@Version
+	private Long version;
+
 	public void setAsDefault() {
 		this.isDefault = true;
 	}

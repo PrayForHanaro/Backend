@@ -9,17 +9,17 @@ import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
 import com.hanaro.userservice.dto.response.UserHomeResponseDTO;
 import com.hanaro.userservice.dto.response.UserMyPageResponseDTO;
 import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
-
 import com.hanaro.userservice.mapper.UserMapper;
 import com.hanaro.userservice.repository.PointRepository;
 import com.hanaro.userservice.repository.UserRepository;
+import com.hanaro.common.storage.StorageService;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -30,6 +30,7 @@ public class UserService {
   private final UserMapper userMapper;
   private final OrgClient orgClient;
   private final PasswordEncoder passwordEncoder;
+  private final StorageService storageService;
 
   @Transactional
   public void signUp(SignUpRequestDTO request) {
@@ -38,7 +39,6 @@ public class UserService {
         throw new IllegalArgumentException("이미 가입된 번호입니다.");
       }
 
-      // 비밀번호 해시
       String encodedPassword = passwordEncoder.encode(request.getPassword());
 
       User user = User.builder()
@@ -73,18 +73,18 @@ public class UserService {
       User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
       OrgMyPageResponseDTO orgDto = orgClient.getOrg();
 
-      return UserMyPageResponseDTO.of(user, orgDto);
+      UserMyPageResponseDTO dto = UserMyPageResponseDTO.of(user, orgDto);
+      if (user.getProfileUrl() != null) {
+          dto.setProfileUrl(storageService.getPresignedUrl(user.getProfileUrl()));
+      }
+      return dto;
     }
 
   @Transactional
   public void usePoint(Long userId, UsePointRequest request) {
-
         User user = userRepository.findById(userId).orElseThrow();
-
         user.minusPoint(request.getAmount());
-
         Point point = Point.usePoint(user, request.getAmount());
-
         pointRepository.save(point);
     }
 
