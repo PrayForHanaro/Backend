@@ -33,6 +33,11 @@ services:
       - "3308:3306"
     volumes:
       - org-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - hana-network
 
@@ -46,6 +51,11 @@ services:
       - "3309:3306"
     volumes:
       - user-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - hana-network
 
@@ -59,6 +69,11 @@ services:
       - "3310:3306"
     volumes:
       - offering-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - hana-network
 
@@ -72,6 +87,11 @@ services:
       - "3311:3306"
     volumes:
       - activity-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - hana-network
 
@@ -85,6 +105,11 @@ services:
       - "3312:3306"
     volumes:
       - prayer-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - hana-network
 
@@ -111,6 +136,11 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
     ports:
       - "9092:9092"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
     networks:
       - hana-network
 
@@ -128,7 +158,8 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
     depends_on:
-      - org-db
+      org-db:
+        condition: service_healthy
     networks:
       - hana-network
 
@@ -141,8 +172,13 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://user-db:3306/user_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_REGION: ${AWS_REGION}
     depends_on:
-      - user-db
+      user-db:
+        condition: service_healthy
     networks:
       - hana-network
 
@@ -157,8 +193,10 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      - offering-db
-      - kafka
+      offering-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     networks:
       - hana-network
 
@@ -178,8 +216,10 @@ services:
       AWS_S3_BUCKET: ${AWS_S3_BUCKET}
       AWS_REGION: ${AWS_REGION}
     depends_on:
-      - activity-db
-      - kafka
+      activity-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     networks:
       - hana-network
 
@@ -194,8 +234,10 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      - prayer-db
-      - kafka
+      prayer-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     networks:
       - hana-network
 
@@ -211,7 +253,8 @@ services:
       JWT_AUDIENCE: ${JWT_AUDIENCE}
       JWT_COOKIE_NAME: ${JWT_COOKIE_NAME}
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     networks:
       - hana-network
 
