@@ -88,8 +88,6 @@ public class ActivityService {
                 throw e;
             }
         }
-        
-        // 2. 업로드된 URL과 함께 DB 저장 호출
         try {
             return createActivityInternal(userId, orgId, request, imageUrls);
         } catch (Exception e) {
@@ -99,7 +97,7 @@ public class ActivityService {
                     storageService.delete(imageUrl);
                 } catch (Exception ex) {
                     // 개별 삭제 실패 시 로그만 남기고 다음 파일 삭제 시도
-                    System.err.println("Failed to delete orphaned file: " + imageUrl + ", error: " + ex.getMessage());
+                    log.error("Failed to delete file during cleanup: {}, error: {}", imageUrl, ex.getMessage());
                 }
             }
             throw e; // 원본 예외 전파
