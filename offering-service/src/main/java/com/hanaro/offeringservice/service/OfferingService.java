@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-
 @Service
 @RequiredArgsConstructor
 public class OfferingService {
@@ -26,11 +25,13 @@ public class OfferingService {
     private final UserClient userClient;
     private final AccountClient accountClient;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
+    private final OfferingTransactionalHelper offeringTransactionalHelper; // 추가
 
     public Long registerOffering(Long userId, OfferingRequestDTO request) {
-        // 1. 로컬 DB 저장 (최소 트랜잭션 범위)
-        Long offeringId = saveOffering(userId, request);
+        OfferingType type = getOfferingType(request.getType());
+
+        // 1. 로컬 DB 저장 (Helper 사용)
+        Long offeringId = offeringTransactionalHelper.saveOffering(userId, request, type);
 
         // 2. 외부 서비스 호출 (트랜잭션 외부 - 네트워크 I/O)
         try {
@@ -50,47 +51,36 @@ public class OfferingService {
                     .userId(userId)
                     .amount(request.getAmount())
                     .accountId(request.getAccountId())
-                    .build()).get();
+                    .build())
+                .whenComplete((result, ex) -> {
+                    if (ex != null)
+                        System.err.println("보상 이벤트 전송 실패: " + ex.getMessage());
+                });
             throw new BaseException(OfferingErrorCode.POINT_USE_FAILED);
         }
 
-        // 3. Kafka 이벤트 발행 (비동기, 성공 보장 필요 시 추후 Outbox 패턴 도입)
-        try {
-            kafkaTemplate.send("offering-topic", OfferingEvent.builder()
-                    .userId(userId)
-                    .orgId(request.getOrgId())
-                    .accountId(request.getAccountId())
-                    .amount(request.getAmount())
-                    .usedPoint(request.getUsedPoint() != null ? request.getUsedPoint().intValue() : 0)
-                    .offeringType(getOfferingType(request.getType()).name())
-                    .build()).get();
-        } catch (Exception e) {
-             throw new BaseException(OfferingErrorCode.OFFERING_EVENT_PUBLISH_FAILED);
-        }
+        // 3. Kafka 이벤트 발행 (비동기)
+        kafkaTemplate.send("offering-topic", OfferingEvent.builder()
+                .userId(userId)
+                .orgId(request.getOrgId())
+                .accountId(request.getAccountId())
+                .amount(request.getAmount())
+                .usedPoint(request.getUsedPoint() != null ? request.getUsedPoint().intValue() : 0)
+                .offeringType(getOfferingType(request.getType()).name())
+                .build())
+            .whenComplete((result, ex) -> {
+                if (ex != null)
+                    System.err.println("헌금 이벤트 전송 실패: " + ex.getMessage());
+            });
 
         return offeringId;
     }
 
-    @Transactional
-    public Long saveOffering(Long userId, OfferingRequestDTO request) {
-        OfferingType type = getOfferingType(request.getType());
-        Offering offering = Offering.builder()
-                .userId(userId)
-                .orgId(request.getOrgId())
-                .accountId(request.getAccountId())
-                .offeringType(type)
-                .amount(request.getAmount())
-                .usedPoint(request.getUsedPoint())
-                .offererName("무기명".equals(request.getPersonType()) ? null : request.getName())
-                .prayerContent(request.getPrayerTopic())
-                .build();
-        return offeringRepository.save(offering).getOfferingId();
-    }
-
     private OfferingType getOfferingType(String typeName) {
         return Arrays.stream(OfferingType.values())
-                .filter(o -> o.name().equals(typeName))
-                .findFirst()
-                .orElse(OfferingType.기타);
+            .filter(o -> o.name().equals(typeName))
+            .findFirst()
+            .orElse(OfferingType.기타);
     }
+}
 

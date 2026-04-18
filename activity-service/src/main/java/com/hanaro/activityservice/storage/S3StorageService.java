@@ -32,7 +32,7 @@ public class S3StorageService implements StorageService {
     @Override
     public String upload(MultipartFile file, String directory) {
         // 원본 파일명 대신 UUID만 사용하여 파일명을 정규화
-        String key = directory + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();;
+        String key = directory + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
 
         try {
             s3Client.putObject(
