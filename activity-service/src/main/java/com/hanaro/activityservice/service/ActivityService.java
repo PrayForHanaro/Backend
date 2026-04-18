@@ -84,8 +84,15 @@ public class ActivityService {
                     imageUrls.add(storageService.upload(files.get(i), "activity"));
                 }
             } catch (Exception e) {
-                imageUrls.forEach(storageService::delete);
-                throw e;
+                // [보상 조치] 업로드 루프 중 실패 시 이미 올라간 파일 삭제
+                for (String imageUrl : imageUrls) {
+                    try {
+                        storageService.delete(imageUrl);
+                    } catch (Exception ex) {
+                        log.error("Failed to delete file during initial upload failure: {}, error: {}", imageUrl, ex.getMessage());
+                    }
+                }
+                throw e; // 원본 예외 전파
             }
         }
         try {

@@ -18,7 +18,7 @@ public class AccountService {
     @Transactional
     public void withdraw(Long accountId, BigDecimal amount) {
         Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new BaseException(UserErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(UserErrorCode.ACCOUNT_NOT_FOUND));
         account.withdraw(amount);
     }
 }

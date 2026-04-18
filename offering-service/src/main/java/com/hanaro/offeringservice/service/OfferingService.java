@@ -12,12 +12,15 @@ import com.hanaro.offeringservice.repository.OfferingRepository;
 import com.hanaro.common.exception.BaseException;
 import com.hanaro.offeringservice.exception.OfferingErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OfferingService {
@@ -30,23 +33,25 @@ public class OfferingService {
     public Long registerOffering(Long userId, OfferingRequestDTO request) {
         OfferingType type = getOfferingType(request.getType());
 
-        // 1. 외부 서비스 호출 (먼저 검증)
+        // 1. 로컬 DB 저장 (헌금 기록 먼저 생성)
+        Long offeringId = offeringTransactionalHelper.saveOffering(userId, request, type);
+
+        // 2. 외부 서비스 호출 (출금)
         try {
             accountClient.withdraw(request.getAccountId(), new AccountWithdrawRequest(request.getAmount()));
         } catch (Exception e) {
+            // [보상 조치] DB 기록 삭제
+            offeringRepository.deleteById(offeringId);
             throw new BaseException(OfferingErrorCode.WITHDRAWAL_FAILED);
         }
 
-        // 2. 로컬 DB 저장 (성공 시 offeringId 반환)
-        Long offeringId = offeringTransactionalHelper.saveOffering(userId, request, type);
-
-        // 3. 포인트 차감 (실패 시 보상 조치)
+        // 3. 포인트 차감
         try {
             if (request.getUsedPoint() != null && request.getUsedPoint().intValue() > 0) {
                 userClient.usePoint(userId, new UsePointRequest(request.getUsedPoint().intValue()));
             }
         } catch (Exception e) {
-            // [보상 조치] 포인트 실패 시 -> 로컬 DB 삭제 + 출금 취소 이벤트 발행
+            // [보상 조치] DB 기록 삭제 + 출금 취소
             offeringRepository.deleteById(offeringId);
             kafkaTemplate.send("withdraw-compensate-topic", OfferingEvent.builder()
                             .userId(userId)
@@ -54,7 +59,7 @@ public class OfferingService {
                             .accountId(request.getAccountId())
                             .build())
                     .whenComplete((result, ex) -> {
-                        if (ex != null) System.err.println("보상 이벤트 전송 실패: " + ex.getMessage());
+                        if (ex != null) log.error("보상 이벤트 전송 실패: {}", ex.getMessage());
                     });
             throw new BaseException(OfferingErrorCode.POINT_USE_FAILED);
         }
@@ -69,7 +74,7 @@ public class OfferingService {
                         .offeringType(type.name())
                         .build())
                 .whenComplete((result, ex) -> {
-                    if (ex != null) System.err.println("헌금 이벤트 전송 실패: " + ex.getMessage());
+                    if (ex != null) log.error("보상 이벤트 전송 실패: {}", ex.getMessage());
                 });
 
         return offeringId;
