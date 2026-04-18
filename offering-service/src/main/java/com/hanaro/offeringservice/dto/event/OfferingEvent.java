@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 public class OfferingEvent {
     private Long userId;
     private Long orgId;
+    private Long accountId; // 추가
     private BigDecimal amount;
     private int usedPoint;
     private String offeringType;

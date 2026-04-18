@@ -66,7 +66,7 @@ public class ActivityController {
     public ApiResponse<String> uploadPhoto(
         @RequestPart("file") MultipartFile file
     ) {
-        String url = storageService.upload(file, "activity");
-        return ApiResponse.ok(url);
+        String key = storageService.upload(file, "activity");
+        return ApiResponse.ok(key);
     }
 }

@@ -45,6 +45,8 @@ public class ActivityService {
     private final ActivityApplyRepository activityApplyRepository;
     private final StorageService storageService;
 
+    private int MAX_IMAGE_COUNT = 3;
+
     public List<ActivityResponse.Summary> getActivities(
             Long userId,
             Long orgId,
@@ -74,7 +76,7 @@ public class ActivityService {
         // 1. 트랜잭션 외부에서 파일 업로드 수행
         List<String> imageUrls = new ArrayList<>();
         if (files != null) {
-            for (int i = 0; i < files.size() && i < 3; i++) {
+            for (int i = 0; i < files.size() && i < MAX_IMAGE_COUNT; i++) {
                 imageUrls.add(storageService.upload(files.get(i), "activity"));
             }
         }

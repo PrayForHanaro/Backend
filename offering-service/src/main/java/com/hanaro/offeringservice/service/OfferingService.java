@@ -9,6 +9,8 @@ import com.hanaro.offeringservice.dto.OfferingRequestDTO;
 import com.hanaro.offeringservice.dto.UsePointRequest;
 import com.hanaro.offeringservice.dto.event.OfferingEvent;
 import com.hanaro.offeringservice.repository.OfferingRepository;
+import com.hanaro.common.exception.BaseException;
+import com.hanaro.offeringservice.exception.OfferingErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -53,7 +55,7 @@ public class OfferingService {
             accountClient.withdraw(request.getAccountId(), 
                     new AccountWithdrawRequest(request.getAmount()));
         } catch (Exception e) {
-            throw new RuntimeException("계좌 출금에 실패했습니다: " + e.getMessage());
+            throw new BaseException(OfferingErrorCode.WITHDRAWAL_FAILED);
         }
 
         // 3. 사용한 포인트 차감 (Feign)
@@ -61,9 +63,13 @@ public class OfferingService {
             try {
                 userClient.usePoint(userId, new UsePointRequest(request.getUsedPoint().intValue()));
             } catch (Exception e) {
-                // 출금은 성공했는데 포인트 차감이 실패하는 경우 (정합성 이슈)
-                // 현재는 예외만 던지지만, 추후 보상 트랜잭션 도입 필요
-                throw new RuntimeException("포인트 차감에 실패했습니다: " + e.getMessage());
+                // [보상 트랜잭션] 포인트 사용 실패 시, 출금 취소 이벤트 발행
+                kafkaTemplate.send("withdraw-compensate-topic", OfferingEvent.builder()
+                        .userId(userId)
+                        .amount(request.getAmount())
+                        .accountId(request.getAccountId())
+                        .build());
+                throw new BaseException(OfferingErrorCode.POINT_USE_FAILED);
             }
         }
 
@@ -71,6 +77,7 @@ public class OfferingService {
         kafkaTemplate.send("offering-topic", OfferingEvent.builder()
                 .userId(userId)
                 .orgId(request.getOrgId())
+                .accountId(request.getAccountId())
                 .amount(request.getAmount())
                 .usedPoint(request.getUsedPoint() != null ? request.getUsedPoint().intValue() : 0)
                 .offeringType(type.name())
