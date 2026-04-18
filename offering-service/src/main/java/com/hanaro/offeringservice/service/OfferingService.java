@@ -64,24 +64,33 @@ public class OfferingService {
                 userClient.usePoint(userId, new UsePointRequest(request.getUsedPoint().intValue()));
             } catch (Exception e) {
                 // [보상 트랜잭션] 포인트 사용 실패 시, 출금 취소 이벤트 발행
-                kafkaTemplate.send("withdraw-compensate-topic", OfferingEvent.builder()
-                        .userId(userId)
-                        .amount(request.getAmount())
-                        .accountId(request.getAccountId())
-                        .build());
+                try {
+                    kafkaTemplate.send("withdraw-compensate-topic", OfferingEvent.builder()
+                            .userId(userId)
+                            .amount(request.getAmount())
+                            .accountId(request.getAccountId())
+                            .build()).get();
+                } catch (Exception ex) {
+                    // 보상 이벤트 발행마저 실패할 경우 로그를 남기고 시스템 관리자에게 알림 필요
+                    throw new BaseException(OfferingErrorCode.POINT_USE_FAILED);
+                }
                 throw new BaseException(OfferingErrorCode.POINT_USE_FAILED);
             }
-        }
+            }
 
-        // 4. Kafka 이벤트 발행 (비동기)
-        kafkaTemplate.send("offering-topic", OfferingEvent.builder()
-                .userId(userId)
-                .orgId(request.getOrgId())
-                .accountId(request.getAccountId())
-                .amount(request.getAmount())
-                .usedPoint(request.getUsedPoint() != null ? request.getUsedPoint().intValue() : 0)
-                .offeringType(type.name())
-                .build());
+            // 4. Kafka 이벤트 발행 (비동기, 성공 보장 필요 시 추후 Outbox 패턴 도입)
+            try {
+            kafkaTemplate.send("offering-topic", OfferingEvent.builder()
+                    .userId(userId)
+                    .orgId(request.getOrgId())
+                    .accountId(request.getAccountId())
+                    .amount(request.getAmount())
+                    .usedPoint(request.getUsedPoint() != null ? request.getUsedPoint().intValue() : 0)
+                    .offeringType(type.name())
+                    .build()).get();
+            } catch (Exception e) {
+             throw new BaseException(OfferingErrorCode.POINT_USE_FAILED);
+            }
 
         return offeringId;
     }

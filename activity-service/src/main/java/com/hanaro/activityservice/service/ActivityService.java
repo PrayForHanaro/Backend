@@ -45,7 +45,7 @@ public class ActivityService {
     private final ActivityApplyRepository activityApplyRepository;
     private final StorageService storageService;
 
-    private int MAX_IMAGE_COUNT = 3;
+    private static final int MAX_IMAGE_COUNT = 3;
 
     public List<ActivityResponse.Summary> getActivities(
             Long userId,
@@ -82,7 +82,15 @@ public class ActivityService {
         }
         
         // 2. 업로드된 URL과 함께 DB 저장 호출
-        return createActivityInternal(userId, orgId, request, imageUrls);
+        try {
+            return createActivityInternal(userId, orgId, request, imageUrls);
+        } catch (Exception e) {
+            // [보상 조치] DB 저장 실패 시 S3에 업로드된 파일 삭제
+            for (String imageUrl : imageUrls) {
+                storageService.delete(imageUrl);
+            }
+            throw e; // 예외 전파
+        }
     }
 
     @Transactional
@@ -182,7 +190,7 @@ public class ActivityService {
     private ActivityResponse.Detail toDetail(Activity activity, Long userId) {
         List<String> imageUrls = activity.getPhotos().stream()
                 .sorted(Comparator.comparingInt(photo -> photo.getOrderNum()))
-                .map(photo -> photo.getPhotoUrl())
+                .map(photo -> storageService.getPresignedUrl(photo.getPhotoUrl())) // 변환 로직 추가
                 .toList();
 
         return ActivityResponse.Detail.builder()
