@@ -148,4 +148,5 @@ jobs:
             done
 
             echo "==== Remove unused containers ===="
+            docker image prune -af
             docker system prune -f
