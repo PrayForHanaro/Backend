@@ -70,8 +70,21 @@ public class ActivityService {
         return toDetail(activity, resolveUserId(userId));
     }
 
-    @Transactional
     public ActivityResponse.Detail createActivity(Long userId, Long orgId, ActivityRequest request, List<MultipartFile> files) {
+        // 1. 트랜잭션 외부에서 파일 업로드 수행
+        List<String> imageUrls = new ArrayList<>();
+        if (files != null) {
+            for (int i = 0; i < files.size() && i < 3; i++) {
+                imageUrls.add(storageService.upload(files.get(i), "activity"));
+            }
+        }
+        
+        // 2. 업로드된 URL과 함께 DB 저장 호출
+        return createActivityInternal(userId, orgId, request, imageUrls);
+    }
+
+    @Transactional
+    public ActivityResponse.Detail createActivityInternal(Long userId, Long orgId, ActivityRequest request, List<String> imageUrls) {
         validateCreateRequest(request);
 
         Long resolvedUserId = resolveUserId(userId);
@@ -97,12 +110,9 @@ public class ActivityService {
                 .pointAmount(request.getPointAmount() != null ? request.getPointAmount() : 30)
                 .build();
 
-        // 이미지 업로드 로직 추가
-        if (files != null) {
-            for (int i = 0; i < files.size() && i < 3; i++) {
-                String imageUrl = storageService.upload(files.get(i), "activity");
-                activity.addPhoto(imageUrl, i + 1);
-            }
+        // 이미지 연결
+        for (int i = 0; i < imageUrls.size(); i++) {
+            activity.addPhoto(imageUrls.get(i), i + 1);
         }
 
         Activity savedActivity = activityRepository.save(activity);

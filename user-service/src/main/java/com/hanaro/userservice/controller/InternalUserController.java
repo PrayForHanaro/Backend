@@ -23,7 +23,6 @@ public class InternalUserController {
       @RequestBody UsePointRequest request
   ) {
     userService.usePoint(userId, request);
-    System.out.println("deploy test v2");
     return ResponseEntity.ok().build();
   }
 

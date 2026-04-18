@@ -55,6 +55,9 @@ public class Account extends  BaseEntity {
 
 	/** 잔액 차감 */
 	public void withdraw(BigDecimal amount) {
+		if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new IllegalArgumentException("유효하지 않은 출금 금액입니다.");
+		}
 		if (this.balance.compareTo(amount) < 0) {
 			throw new BaseException(UserErrorCode.INSUFFICIENT_BALANCE);
 		}
