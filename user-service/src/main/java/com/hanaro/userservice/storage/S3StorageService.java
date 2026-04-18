@@ -35,7 +35,7 @@ public class S3StorageService implements StorageService {
             ? originalFilename.substring(originalFilename.lastIndexOf("."))
             : "";
         String key = directory + "/" + UUID.randomUUID() + extension;
-        try {
+        try (java.io.InputStream inputStream = file.getInputStream()) {
             s3Client.putObject(
                 PutObjectRequest.builder()
                     .bucket(bucket)
@@ -43,7 +43,7 @@ public class S3StorageService implements StorageService {
                     .contentType(file.getContentType())
                     .contentLength(file.getSize())
                     .build(),
-                RequestBody.fromInputStream(file.getInputStream(), file.getSize())
+                RequestBody.fromInputStream(inputStream, file.getSize())
             );
         } catch (IOException e) {
             throw new BaseException(UserErrorCode.FILE_UPLOAD_FAILED);

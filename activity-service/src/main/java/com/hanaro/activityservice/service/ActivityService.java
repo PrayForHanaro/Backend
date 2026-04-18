@@ -79,9 +79,12 @@ public class ActivityService {
         // 1. 트랜잭션 외부에서 파일 업로드 수행
         List<String> imageUrls = new ArrayList<>();
         if (files != null) {
+            if (files.size() > MAX_IMAGE_COUNT) {
+                throw new IllegalArgumentException("최대 " + MAX_IMAGE_COUNT + "개의 이미지만 업로드 가능합니다.");
+            }
             try {
-                for (int i = 0; i < files.size() && i < MAX_IMAGE_COUNT; i++) {
-                    imageUrls.add(storageService.upload(files.get(i), "activity"));
+                for (MultipartFile file : files) {
+                    imageUrls.add(storageService.upload(file, "activity"));
                 }
             } catch (Exception e) {
                 // [보상 조치] 업로드 루프 중 실패 시 이미 올라간 파일 삭제
