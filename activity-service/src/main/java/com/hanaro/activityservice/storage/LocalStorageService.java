@@ -33,7 +33,7 @@ public class LocalStorageService implements StorageService {
 			String fileName = UUID.randomUUID().toString() + "." + file.getOriginalFilename();
 			Path path = Paths.get(uploadDir + directory + "/" + fileName);
 			Files.createDirectories(path.getParent());
-			Files.write(path, file.getBytes());
+			Files.copy(file.getInputStream(), path);
 			return "/uploads/" + directory + "/" + fileName;
 		} catch (IOException e) {
 			throw new BaseException(ActivityErrorCode.FILE_UPLOAD_FAILED);

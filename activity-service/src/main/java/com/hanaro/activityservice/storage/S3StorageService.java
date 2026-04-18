@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.util.UUID;
 
 @Service
-@Profile("prod")
+@Primary
 @RequiredArgsConstructor
 public class S3StorageService implements StorageService {
 
@@ -41,7 +41,7 @@ public class S3StorageService implements StorageService {
                     .contentType(file.getContentType())
                     .contentLength(file.getSize())
                     .build(),
-                RequestBody.fromBytes(file.getBytes())
+                RequestBody.fromInputStream(file.getInputStream(), file.getSize())
             );
         } catch (IOException e) {
             throw new BaseException(ActivityErrorCode.FILE_UPLOAD_FAILED);
