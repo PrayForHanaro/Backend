@@ -36,18 +36,18 @@ services:
     networks:
       - hana-network
 
-  user-db:
-    image: mysql:8.0
-    container_name: user-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: user_db
-    ports:
-      - "3309:3306"
-    volumes:
-      - user-db-data:/var/lib/mysql
-    networks:
-      - hana-network
+#  user-db:
+#    image: mysql:8.0
+#    container_name: user-db
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_DATABASE: user_db
+#    ports:
+#      - "3309:3306"
+#    volumes:
+#      - user-db-data:/var/lib/mysql
+#    networks:
+#      - hana-network
 
   offering-db:
     image: mysql:8.0
@@ -132,19 +132,19 @@ services:
     networks:
       - hana-network
 
-  user-service:
-    build: ./user-service
-    container_name: user-service
-    ports:
-      - "8082:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://user-db:3306/user_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-    depends_on:
-      - user-db
-    networks:
-      - hana-network
+#  user-service:
+#    build: ./user-service
+#    container_name: user-service
+#    ports:
+#      - "8082:8080"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://user-db:3306/user_db
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: root
+#    depends_on:
+#      - user-db
+#    networks:
+#      - hana-network
 
   offering-service:
     build: ./offering-service
@@ -190,6 +190,22 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - prayer-db
+      - kafka
+    networks:
+      - hana-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8086:8080"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+      JWT_COOKIE_NAME: ${JWT_COOKIE_NAME}
+    depends_on:
       - kafka
     networks:
       - hana-network

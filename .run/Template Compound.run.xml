@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="true" type="CompoundRunConfigurationType">
+    <toRun name="Whole project" type="JUnit" />
+    <toRun name="ActivityServiceApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="ApiGatewayApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="OfferingServiceApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="OrgServiceApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="PrayerServiceApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="UserServiceApplication" type="SpringBootApplicationConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>
