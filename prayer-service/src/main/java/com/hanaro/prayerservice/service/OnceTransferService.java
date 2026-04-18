@@ -32,8 +32,9 @@ public class OnceTransferService {
         }
         Long fromAccountId = giving.getAccountId();
 
+        BigDecimal amount = BigDecimal.valueOf(request.getAmount());
         try {
-            userClient.withdraw(fromAccountId, WithdrawRequest.builder().amount(request.getAmount()).build());
+            userClient.withdraw(fromAccountId, WithdrawRequest.builder().amount(amount).build());
         } catch (FeignException e) {
             throw new PrayerException(PrayerErrorCode.TRANSFER_FAILED);
         }
@@ -43,7 +44,7 @@ public class OnceTransferService {
                         .senderId(senderId)
                         .fromAccountId(fromAccountId)
                         .toAccountNumber(request.getAccountNumber())
-                        .amount(BigDecimal.valueOf(request.getAmount()))
+                        .amount(amount)
                         .message(request.getMessage())
                         .sentAt(LocalDateTime.now())
                         .build()
