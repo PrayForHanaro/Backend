@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class UserSimpleResponseDTO {
     private Long userId;
     private String name;
-    private String imageType;
 }

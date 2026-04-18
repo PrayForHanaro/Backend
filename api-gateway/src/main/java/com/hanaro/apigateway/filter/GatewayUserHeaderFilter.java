@@ -22,10 +22,10 @@ public class GatewayUserHeaderFilter {
 
             // 1) spoofing 가능한 외부 헤더 제거
             builder.headers(headers -> {
-                headers.remove("X-User-Id");
-                headers.remove("X-User-Name");
-                headers.remove("X-User-Role");
-                headers.remove("X-Org-Id");
+                headers.remove("X-Auth-User-Id");
+                headers.remove("X-Auth-User-Name");
+                headers.remove("X-Auth-User-Role");
+                headers.remove("X-Auth-Org-Id");
             });
 
             // 2) SecurityContext에서 현재 인증 정보 꺼내기
@@ -52,18 +52,10 @@ public class GatewayUserHeaderFilter {
 
             // 3) 내부 헤더 재주입
             builder.headers(headers -> {
-                if (userId != null) {
-                    headers.set("X-User-Id", userId);
-                }
-                if (userName != null) {
-                    headers.set("X-User-Name", userName);
-                }
-                if (orgId != null) {
-                    headers.set("X-Org-Id", orgId);
-                }
-                if (!roles.isEmpty()) {
-                    headers.set("X-User-Role", String.join(",", roles));
-                }
+                if (userId != null) headers.set("X-Auth-User-Id", userId);
+                if (userName != null) headers.set("X-Auth-User-Name", userName);
+                if (orgId != null) headers.set("X-Auth-Org-Id", orgId);
+                if (!roles.isEmpty()) headers.set("X-Auth-User-Role", String.join(",", roles));
             });
 
             return builder.build();

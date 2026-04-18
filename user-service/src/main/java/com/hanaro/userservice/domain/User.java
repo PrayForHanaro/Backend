@@ -106,12 +106,16 @@ public class User extends BaseEntity {
 	 * @param hanaPensionCount 현재 하나은행 연금 갯수
 	 */
 	public void updateDonationRate(int hanaPensionCount) {
-		this.donationRate = (double) hanaPensionCount;
+		this.donationRate = hanaPensionCount / 100.0;
 	}
 
 	/** 역할 변경 */
 	public void updateRole(UserRole role) {
 		this.role = role;
+	}
+
+	public void updateProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
 	}
 
 	public void addPoint(int amount){

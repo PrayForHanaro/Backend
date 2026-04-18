@@ -130,6 +130,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
+          envs: AWS_ACCESS_KEY, AWS_SECRET_KEY
           script: |
             echo "==== ECR Login ===="
             aws ecr get-login-password --region ap-northeast-2 | \
@@ -138,11 +139,26 @@ jobs:
             echo "==== Move to project directory ===="
             cd ~/project
 
+            echo "==== Exporting S3 Environment Variables ===="
+            export AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }}
+            export AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            export AWS_REGION=ap-northeast-2
+
             echo "==== Deploy changed services only ===="
             CHANGED='${{ needs.detect-changes.outputs.modules }}'
 
             for service in $(echo "$CHANGED" | jq -r '.[]'); do
               echo "Deploying $service"
+
+              # 서비스별 S3 버킷 분기 설정
+              if [ "$service" == "user-service" ]; then
+                export AWS_S3_BUCKET=hana2-private
+              elif [ "$service" == "activity-service" ]; then
+                export AWS_S3_BUCKET=hana2-public
+              else
+                export AWS_S3_BUCKET=hana2-public # 기본값
+              fi
+
               docker-compose pull $service
               docker-compose up -d --no-deps $service
             done
