@@ -30,7 +30,10 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ActivityService {
@@ -76,8 +79,13 @@ public class ActivityService {
         // 1. 트랜잭션 외부에서 파일 업로드 수행
         List<String> imageUrls = new ArrayList<>();
         if (files != null) {
-            for (int i = 0; i < files.size() && i < MAX_IMAGE_COUNT; i++) {
-                imageUrls.add(storageService.upload(files.get(i), "activity"));
+            try {
+                for (int i = 0; i < files.size() && i < MAX_IMAGE_COUNT; i++) {
+                    imageUrls.add(storageService.upload(files.get(i), "activity"));
+                }
+            } catch (Exception e) {
+                imageUrls.forEach(storageService::delete);
+                throw e;
             }
         }
         
