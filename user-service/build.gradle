@@ -37,9 +37,10 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.25.0'
 
     // MapStruct
-    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
     implementation project(':common')
 }
@@ -47,4 +48,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-

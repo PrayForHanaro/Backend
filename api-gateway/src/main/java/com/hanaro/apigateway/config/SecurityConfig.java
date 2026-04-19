@@ -30,7 +30,8 @@ public class SecurityConfig {
 
     http
         .securityMatcher(
-            "/apis/auth/**",    // 경로명(api vs apis) 통일 확인 필요
+            "/apis/user/users/signup",
+            "/apis/user/users/login",
             "/api/public/**",
             "/health",
             "/error",
