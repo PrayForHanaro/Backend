@@ -24,3 +24,9 @@ spring:
 feign:
   circuitbreaker:
     enabled: false   # 테스트에서는 필요 없음
+
+security:
+  internal:
+    hmac-secret: asdfasdf
+    api-key: asdfasdfasdf
+    valid-api-keys: asdfasdfasdfasdf
