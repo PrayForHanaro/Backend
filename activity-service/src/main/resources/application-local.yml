@@ -1,6 +1,18 @@
 spring:
+  config:
+    activate:
+      on-profile: local
+
+# 로컬 환경 스토리지 설정
+storage:
+  type: local
+  upload-dir: uploads/
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://activity-db:3306/activity_db
     username: root
     password: root
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:sql/init.sql

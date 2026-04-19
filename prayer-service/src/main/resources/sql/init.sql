@@ -1,42 +1,50 @@
 -- =============================================
--- 1. GIFT (증여 자동이체 설정)
--- 매달 지정된 사람의 적금계좌에 자동이체
--- 가입하지 않은 사용자에게 보낼 경우 receiver_id NULL
--- sender_id, receiver_id, from_account_id, to_savings_account_id
--- → user_db 참조, FK 없음
+-- 1. Gift
 -- =============================================
-CREATE TABLE IF NOT EXISTS GIFT (
-    gift_id                BIGINT        NOT NULL AUTO_INCREMENT,
-    sender_id              BIGINT        NOT NULL COMMENT '보내는 사람 ID, user_db 참조 FK없음',
-    receiver_id            BIGINT        NULL     COMMENT '받는 사람 ID, 미가입자면 NULL, user_db 참조 FK없음',
-    gift_receiver_type     VARCHAR(20)   NOT NULL COMMENT '수신자 유형',
-    from_account_id        BIGINT        NOT NULL COMMENT '출금 계좌 ID, user_db 참조 FK없음',
-    to_savings_account_id  BIGINT        NOT NULL COMMENT '입금 적금 계좌 ID, user_db 참조 FK없음',
-    amount                 DECIMAL(15,2) NOT NULL COMMENT '매달 자동이체 금액',
-    cumulative_total       DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT '누적 송금 총액',
-    is_active              TINYINT(1)    NOT NULL DEFAULT 1 COMMENT '1=활성화, 0=비활성화',
-    savings_product_name   VARCHAR(100)  NOT NULL COMMENT '적금 상품 이름',
-    interest_rate          DECIMAL(5,2)  NOT NULL DEFAULT 0 COMMENT '적금 상품 혜택률(%)',
-    created_at             DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at             DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (gift_id)
-    );
+CREATE TABLE IF NOT EXISTS Gift (
+    `giftId`                INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+    `senderId`              BIGINT        NOT NULL,
+    `receiverId`            BIGINT        NULL,
+    `giftReceiverType`     VARCHAR(20)   NOT NULL,
+    `fromAccountId`        BIGINT        NOT NULL,
+    `toSavingsAccountId`  BIGINT        NOT NULL,
+    `amount`                 DECIMAL(15,2) NOT NULL,
+    `isActive`              TINYINT(1)    NOT NULL DEFAULT 1,
+    `cumulativeTotal`       DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    `savingsProductName`   VARCHAR(100)  NOT NULL,
+    `interestRate`          DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    `createdAt`             DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt`             DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`giftId`)
+);
 
 -- =============================================
--- 2. PRAYER_SAVINGS (기도문 리스트)
--- Gift와 1:N 관계
--- 송금과 별개로 기도문만 관리
--- gift_id → 같은 DB, FK 정상 사용
+-- 2. PrayerSavings
 -- =============================================
-CREATE TABLE IF NOT EXISTS PRAYER_SAVINGS (
-    prayer_savings_id BIGINT       NOT NULL AUTO_INCREMENT,
-    gift_id           BIGINT       NOT NULL COMMENT '연결된 증여 ID',
-    prayer_content    VARCHAR(100) NOT NULL COMMENT '기도문',
-    start_date        DATE         NOT NULL COMMENT '기도 시작일',
-    d_day             INT          NOT NULL DEFAULT 0 COMMENT 'D+N 현재 경과일수',
-    created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (prayer_savings_id),
-    CONSTRAINT fk_prayer_savings_gift
-    FOREIGN KEY (gift_id) REFERENCES GIFT (gift_id)
-    );
+CREATE TABLE IF NOT EXISTS PrayerSavings (
+    `prayerSavingsId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `giftId`            INT UNSIGNED NOT NULL,
+    `prayerContent`    VARCHAR(100) NOT NULL,
+    `startDate`        DATE         NOT NULL,
+    `dDay`             INT          NOT NULL DEFAULT 0,
+    `createdAt`        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt`        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`prayerSavingsId`),
+    CONSTRAINT fk_prayer_savings_gift FOREIGN KEY (`giftId`) REFERENCES Gift (`giftId`) ON DELETE CASCADE
+);
+
+-- =============================================
+-- SEED DATA (INSERT IGNORE 사용)
+-- =============================================
+INSERT IGNORE INTO Gift (`giftId`, `senderId`, `receiverId`, `giftReceiverType`, `fromAccountId`, `toSavingsAccountId`, `amount`, `cumulativeTotal`, `savingsProductName`, `interestRate`) VALUES
+(1, 1, 2, 'GRANDCHILD', 1, 4, 100000, 200000, '하나 하나님의 적금', 3.5),
+(2, 2, NULL, 'GRANDCHILD', 2, 999, 50000, 50000, '꿈나무 축복 적금', 4.0),
+(3, 3, 2, 'GRANDCHILD', 3, 4, 10000, 10000, '성도 사랑 적금', 2.5);
+
+INSERT IGNORE INTO PrayerSavings (`prayerSavingsId`, `giftId`, `prayerContent`, `startDate`, `dDay`) VALUES
+(1, 1, '매달 쌓이는 적금처럼 당신을 향한 축복도 쌓여가길 기도합니다.', '2026-04-01', 19),
+(2, 1, '지치고 힘들 때마다 이 적금이 작은 위로가 되길 바랍니다.', '2026-04-01', 19),
+(3, 1, '오늘도 주님의 은혜 안에서 평안한 하루 보내세요.', '2026-04-01', 19),
+(4, 2, '우리 아이가 하나님의 사랑 안에서 지혜롭게 자라기를 기도합니다.', '2026-04-10', 9),
+(5, 2, '건강하게 자라주어 고맙다. 항상 응원한다.', '2026-04-10', 9),
+(6, 3, '우리 성도님의 삶에 주님의 축복이 가득하길 소망합니다.', '2026-04-15', 4);

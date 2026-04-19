@@ -19,8 +19,8 @@ public class OfferingController {
 
     @PostMapping("/once")
     public ApiResponse<Long> registerOffering(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody OfferingRequestDTO request) {
-        return ApiResponse.ok(offeringService.registerOffering(userDetails.getUserId(), request));
+        return ApiResponse.ok(offeringService.registerOffering(user.getUserId(), request));
     }
 }

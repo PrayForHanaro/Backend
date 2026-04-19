@@ -1,10 +1,9 @@
 spring:
-  config:
-    import: classpath:security.yml
-
   profiles:
     active: local
-
+  web:
+    resources:
+      static-locations: "classpath:/static/,classpath:/META-INF/resources/"
   application:
     name: api-gateway
 
@@ -26,6 +25,60 @@ spring:
             allowedHeaders:
               - "*"
             allowCredentials: true
+      mvc:
+        routes:
+          - id: org-service
+            uri: http://org-service:8080
+            predicates:
+              - Path=/org/**
+            filters:
+              - StripPrefix=1
+
+          - id: offering-service
+            uri: http://offering-service:8080
+            predicates:
+              - Path=/offering/**
+            filters:
+              - StripPrefix=1
+
+          - id: activity-service
+            uri: http://activity-service:8080
+            predicates:
+              - Path=/activity/**
+            filters:
+              - StripPrefix=1
+
+          - id: prayer-service
+            uri: http://prayer-service:8080
+            predicates:
+              - Path=/prayer/**
+            filters:
+              - StripPrefix=1
+              -
+          - id: user-service
+            uri: http://user-service:8080
+            predicates:
+              - Path=/user/**
+            filters:
+              - StripPrefix=1
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    persistAuthorization: true
+    disable-swagger-default-url: true
+    display-query-params-with-default: true
+    urls:
+      - name: org-service
+        url: /org/v3/api-docs
+      - name: offering-service
+        url: /offering/v3/api-docs
+      - name: activity-service
+        url: /activity/v3/api-docs
+      - name: prayer-service
+        url: /prayer/v3/api-docs
+      - name: user-service
+        url: /user/v3/api-docs
 
 server:
   port: 8080
@@ -44,4 +97,30 @@ downstream:
   org-service: http://org-service:8080
 
 jwt:
-  cookie-name: accessToken
+  secret: ${JWT_SECRET}
+  issuer: ${JWT_ISSUER}
+  audience: ${JWT_AUDIENCE}
+  cookie-name: ${JWT_COOKIE_NAME}
+
+security:
+  auth:
+    permit-paths:
+      - /health
+      - /info
+      - /actuator/health
+      - /public/**
+      - /error
+    admin-paths:
+      - /api/admin/**
+
+  internal-headers:
+    user-id: X-User-Id
+    user-role: X-User-Role
+    user-name: X-User-Name
+    org-id: X-Org-Id
+
+  remove-external-headers:
+    - X-User-Id
+    - X-User-Role
+    - X-User-Name
+    - X-Org-Id

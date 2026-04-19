@@ -1,5 +1,7 @@
 package com.hanaro.userservice.domain;
 
+import com.hanaro.common.exception.BaseException;
+import com.hanaro.userservice.exception.UserErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +10,7 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "ACCOUNT")
+@Table(name = "Account")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -20,28 +22,32 @@ public class Account extends  BaseEntity {
 	private Long accountId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = true)
+	@JoinColumn(name = "userId", nullable = true)
 	private User user;
 
-	@Column(nullable = false, length = 50)
+	@Column(name = "bankName", nullable = false, length = 50)
 	private String bankName;
 
-	@Column(nullable = false, unique = true, length = 30)
+	@Column(name = "accountNumber", nullable = false, unique = true, length = 30)
 	private String accountNumber;
 
 	/** 잔액 */
-	@Column(nullable = false)
+	@Column(name = "balance", nullable = false)
 	@Builder.Default
 	private BigDecimal balance = BigDecimal.ZERO;
 
-	@Column(nullable = false)
+	@Column(name = "isHana", nullable = false)
 	private boolean isHana;
 
-	@Column(nullable = false)
+	@Column(name = "isDefault", nullable = false)
 	private boolean isDefault;
 
-	@Column(nullable = false)
+	@Column(name = "isSavings", nullable = false)
 	private boolean isSavings;
+
+	@Version
+	@Column(name = "version")
+	private Long version;
 
 	public void setAsDefault() {
 		this.isDefault = true;
@@ -53,8 +59,11 @@ public class Account extends  BaseEntity {
 
 	/** 잔액 차감 */
 	public void withdraw(BigDecimal amount) {
+		if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new IllegalArgumentException("유효하지 않은 출금 금액입니다.");
+		}
 		if (this.balance.compareTo(amount) < 0) {
-			throw new RuntimeException("Insufficient balance");
+			throw new BaseException(UserErrorCode.INSUFFICIENT_BALANCE);
 		}
 		this.balance = this.balance.subtract(amount);
 	}

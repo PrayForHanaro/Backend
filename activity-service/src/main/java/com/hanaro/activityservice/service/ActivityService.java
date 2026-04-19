@@ -11,10 +11,13 @@ import com.hanaro.activityservice.dto.request.ActivityRequest;
 import com.hanaro.activityservice.dto.response.ActivityResponse;
 import com.hanaro.activityservice.repository.ActivityApplyRepository;
 import com.hanaro.activityservice.repository.ActivityRepository;
+import com.hanaro.common.storage.StorageService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +30,10 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ActivityService {
@@ -40,6 +46,9 @@ public class ActivityService {
 
     private final ActivityRepository activityRepository;
     private final ActivityApplyRepository activityApplyRepository;
+    private final StorageService storageService;
+
+    private static final int MAX_IMAGE_COUNT = 3;
 
     public List<ActivityResponse.Summary> getActivities(
             Long userId,
@@ -66,8 +75,47 @@ public class ActivityService {
         return toDetail(activity, resolveUserId(userId));
     }
 
+    public ActivityResponse.Detail createActivity(Long userId, Long orgId, ActivityRequest request, List<MultipartFile> files) {
+        // 1. 트랜잭션 외부에서 파일 업로드 수행
+        List<String> imageUrls = new ArrayList<>();
+        if (files != null) {
+            if (files.size() > MAX_IMAGE_COUNT) {
+                throw new IllegalArgumentException("최대 " + MAX_IMAGE_COUNT + "개의 이미지만 업로드 가능합니다.");
+            }
+            try {
+                for (MultipartFile file : files) {
+                    imageUrls.add(storageService.upload(file, "activity"));
+                }
+            } catch (Exception e) {
+                // [보상 조치] 업로드 루프 중 실패 시 이미 올라간 파일 삭제
+                for (String imageUrl : imageUrls) {
+                    try {
+                        storageService.delete(imageUrl);
+                    } catch (Exception ex) {
+                        log.error("Failed to delete file during initial upload failure: {}, error: {}", imageUrl, ex.getMessage());
+                    }
+                }
+                throw e; // 원본 예외 전파
+            }
+        }
+        try {
+            return createActivityInternal(userId, orgId, request, imageUrls);
+        } catch (Exception e) {
+            // [보상 조치] DB 저장 실패 시 S3에 업로드된 파일 삭제
+            for (String imageUrl : imageUrls) {
+                try {
+                    storageService.delete(imageUrl);
+                } catch (Exception ex) {
+                    // 개별 삭제 실패 시 로그만 남기고 다음 파일 삭제 시도
+                    log.error("Failed to delete file during cleanup: {}, error: {}", imageUrl, ex.getMessage());
+                }
+            }
+            throw e; // 원본 예외 전파
+        }
+    }
+
     @Transactional
-    public ActivityResponse.Detail createActivity(Long userId, Long orgId, ActivityRequest request) {
+    public ActivityResponse.Detail createActivityInternal(Long userId, Long orgId, ActivityRequest request, List<String> imageUrls) {
         validateCreateRequest(request);
 
         Long resolvedUserId = resolveUserId(userId);
@@ -93,14 +141,9 @@ public class ActivityService {
                 .pointAmount(request.getPointAmount() != null ? request.getPointAmount() : 30)
                 .build();
 
-        List<String> imageUrls = safeList(request.getImageUrls());
-
-        for (int index = 0; index < imageUrls.size() && index < 3; index++) {
-            String imageUrl = imageUrls.get(index);
-
-            if (StringUtils.hasText(imageUrl)) {
-                activity.addPhoto(imageUrl, index + 1);
-            }
+        // 이미지 연결
+        for (int i = 0; i < imageUrls.size(); i++) {
+            activity.addPhoto(imageUrls.get(i), i + 1);
         }
 
         Activity savedActivity = activityRepository.save(activity);
@@ -168,7 +211,7 @@ public class ActivityService {
     private ActivityResponse.Detail toDetail(Activity activity, Long userId) {
         List<String> imageUrls = activity.getPhotos().stream()
                 .sorted(Comparator.comparingInt(photo -> photo.getOrderNum()))
-                .map(photo -> photo.getPhotoUrl())
+                .map(photo -> storageService.getPresignedUrl(photo.getPhotoUrl())) // 변환 로직 추가
                 .toList();
 
         return ActivityResponse.Detail.builder()

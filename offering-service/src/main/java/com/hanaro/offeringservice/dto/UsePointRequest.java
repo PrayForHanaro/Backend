@@ -2,13 +2,13 @@ package com.hanaro.offeringservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UsePointRequest {
-  int amount;
+    private int amount;
 }

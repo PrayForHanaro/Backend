@@ -15,7 +15,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "USER")
+@Table(name = "User")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -27,55 +27,39 @@ public class User extends BaseEntity {
 	private Long userId;
 
 	/** 소속 교회/성당/절 ID (org_db 참조, FK 없음) */
-	@Column(nullable = true)
+	@Column(name = "orgId", nullable = true)
 	private Long orgId;
 
 	/** 이름 */
-	@Column(nullable = false, length = 50)
+	@Column(name = "name", nullable = false, length = 50)
 	private String name;
 
 	/** 생년월일 */
-	@Column(nullable = false)
+	@Column(name = "birthDate", nullable = false)
 	private LocalDate birthDate;
 
 	/** 전화번호 (로그인 ID로 사용) */
-	//형식 알아서 지정
-	@Column(nullable = false, unique = true, length = 20)
+	@Column(name = "phone", nullable = false, unique = true, length = 20)
 	private String phone;
 
-  @Column(nullable = false, length = 255)
+	@Column(name = "password", nullable = false, length = 255)
 	private String password;
 
-	/**
-	 * 역할
-	 * ex 일반 / 집사 / 권사 / 목사 / 관리자
-	 * 회원가입 시 교회 성도 리스트에서 자동 식별
-	 */
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 10)
+	@Column(name = "role", nullable = false, length = 10)
 	private UserRole role;
 
-	@Column(nullable = true)
+	@Column(name = "profileUrl", nullable = true)
 	String profileUrl;
-		/**
-	 * 기본 출금 계좌 ID
-	 * 같은 DB이지만 순환참조로 인해 FK 후처리
-	 * (ACCOUNT 테이블 생성 후 ALTER TABLE로 FK 추가)
-	 */
 
-	// User.java 내부 수정
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "default_account_id", nullable = true) // 초기 생성시엔 null일 수 있음
-	private Account defaultAccount; // 필드명을 ID가 아닌 객체로 변경
+	@JoinColumn(name = "defaultAccountId", nullable = true)
+	private Account defaultAccount;
 
-	/**
-	 * 헌금 기여율
-	 * 하나은행 연금 1개당 1% 증가 ???
-	 * 예: 연금 2개 = 2.00%
-	 */
-	@Column(nullable = false)
+	@Column(name = "donationRate", nullable = false)
 	private Double donationRate;
 
+	@Column(name = "pointSum")
 	private int pointSum;
 
 	// 같은 DB → 양방향 관계 정상 사용
@@ -112,6 +96,10 @@ public class User extends BaseEntity {
 	/** 역할 변경 */
 	public void updateRole(UserRole role) {
 		this.role = role;
+	}
+
+	public void updateProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
 	}
 
 	public void addPoint(int amount){

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  * SAVINGS_JOIN        정기 적금 가입 (고정 5000p)
  */
 @Entity
-@Table(name = "POINT")
+@Table(name = "Point")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -31,10 +31,10 @@ public class Point extends BaseEntity {
 
 	/** 포인트 적립/차감 대상 성도 (같은 DB → FK 정상 사용) */
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "userId", nullable = false)
 	private User user;
 
-	@Column(nullable = false, length = 30)
+	@Column(name = "pointType", nullable = false, length = 30)
 	@Enumerated(EnumType.STRING)
 	private PointType pointType;
 
@@ -42,10 +42,10 @@ public class Point extends BaseEntity {
 	 * 지급/차감 포인트
 	 * 양수 = 적립, 음수 = 차감
 	 */
-	@Column(nullable = false)
+	@Column(name = "amount", nullable = false)
 	private int amount;
 
-	// @Column(length = 200)
+	@Column(name = "info")
 	private String info;
 
 	//유형별 info 형식

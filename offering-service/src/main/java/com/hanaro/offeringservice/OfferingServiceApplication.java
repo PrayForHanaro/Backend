@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication(scanBasePackages = "com.hanaro")
-@EnableFeignClients
 public class OfferingServiceApplication {
 
     public static void main(String[] args) {

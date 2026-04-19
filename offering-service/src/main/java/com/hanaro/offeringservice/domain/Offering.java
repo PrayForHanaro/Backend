@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "OFFERING")
+@Table(name = "Offering")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -24,35 +24,28 @@ public class Offering extends BaseEntity{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long offeringId;
 
-	/** 헌금한 성도 ID (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "userId", nullable = false)
 	private Long userId;
 
-	/** 소속 교회/성당/절 ID (org_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "orgId", nullable = false)
 	private Long orgId;
 
-	/** 출금 계좌 ID (user_db 참조, FK 없음) */
-	@Column(nullable = false)
-	private Long accountId; //사용자가 출금 계좌를 변경할 수 있으므로, 어떤 계좌에서 보낸건지는 기록해야됨.
+	@Column(name = "accountId", nullable = false)
+	private Long accountId;
 
-	/**
-	 * 헌금 종류
-	 */
 	@Enumerated(EnumType.STRING)
+	@Column(name = "offeringType")
 	private OfferingType offeringType;
 
-	/** 헌금 금액 */
-	@Column(nullable = false, precision = 15, scale = 2)
+	@Column(name = "amount", nullable = false, precision = 15, scale = 2)
 	private BigDecimal amount;
 
-	@Column(length = 50) //무기명이면 null
+	@Column(name = "offererName", length = 50)
 	private String offererName;
 
-	/** 기도제목 (최대 250자, 선택) */
-	@Column(length = 250)
+	@Column(name = "prayerContent", length = 250)
 	private String prayerContent;
 
-	/** 사용한 포인트 (0일 수 있음) */
+	@Column(name = "usedPoint")
 	private BigDecimal usedPoint;
 }

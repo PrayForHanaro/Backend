@@ -21,7 +21,9 @@
           docker compose up --build -d
 
         - 방법 2: 선택적 서비스 실행  
-          본인이 담당한 모듈이나 필요한 인프라만 골라서 실행.   
+          본인이 담당한 모듈이나 필요한 인프라만 골라서 실행.
+
+          docker-compose up -d --build user-service
        
           [형식] docker compose up -d [서비스명] [DB명] [인프라명] [api-gateway]
           - 예: 기도 서비스와 연관 인프라만 실행할 경우   

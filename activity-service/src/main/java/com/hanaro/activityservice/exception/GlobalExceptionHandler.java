@@ -1,5 +1,7 @@
 package com.hanaro.activityservice.exception;
 
+import com.hanaro.common.exception.BaseException;
+import com.hanaro.common.exception.ErrorCode;
 import com.hanaro.common.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,5 +27,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleException(Exception exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.fail("활동 서비스 내부 오류가 발생했습니다."));
+    }
+
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBaseException(BaseException exception) {
+        ErrorCode errorCode = exception.getErrorCode();
+        return ResponseEntity.status(errorCode.getStatus())
+            .body(ApiResponse.fail(errorCode.getMessage()));
     }
 }

@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
     name = "user-service",
     contextId = "accountClient",
     url = "http://user-service:8080"
-) // 인터페이스로 작성
+)
 public interface AccountClient {
+
     @PostMapping("/internal/accounts/{accountId}/withdraw")
     void withdraw(@PathVariable Long accountId, @RequestBody AccountWithdrawRequest request);
 }
