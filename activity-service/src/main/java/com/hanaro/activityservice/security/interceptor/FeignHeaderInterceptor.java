@@ -1,4 +1,4 @@
-package com.hanaro.offeringservice.security.interceptor;
+package com.hanaro.activityservice.security.interceptor;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
