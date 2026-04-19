@@ -15,4 +15,5 @@ public class OnceTransferResponse {
 
     private String id;
     private Instant sentAt;
+    private String status;
 }

@@ -10,6 +10,7 @@ import java.time.Instant;
  * - Gift와 독립. 적금 가입 없이 즉시 송금 (decisions/003 대상자 한정 규칙 미적용)
  * - 수신자는 등록 대상자일 수도, 미등록 계좌번호일 수도 있음 (BLESS_SPEC §5-1-7)
  * - Mock 송금이나 기록은 실제 저장 (BLESS_SPEC §5-1-9)
+ * - 상태: PENDING(저장) → SUCCESS(출금 완료) 또는 FAILED(출금 실패)
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -46,7 +47,28 @@ public class OnceTransfer extends BaseEntity {
     @Column(length = 250)
     private String message;
 
-    /** 송금 시각 (UTC 기준 Instant; 계약 bless-api.md 의 ISO-8601 Z 포맷) */
+    /** 송금 시도 시각 (UTC 기준 Instant; 계약 bless-api.md 의 ISO-8601 Z 포맷) */
     @Column(nullable = false)
     private Instant sentAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 16)
+    private TransferStatus status;
+
+    @Column(length = 255)
+    private String failureReason;
+
+    /** 외부 출금 성공 후 상태 확정 시각 */
+    private Instant completedAt;
+
+    public void markSuccess(Instant at) {
+        this.status = TransferStatus.SUCCESS;
+        this.completedAt = at;
+        this.failureReason = null;
+    }
+
+    public void markFailed(String reason) {
+        this.status = TransferStatus.FAILED;
+        this.failureReason = reason;
+    }
 }

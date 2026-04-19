@@ -69,6 +69,11 @@ CREATE TABLE IF NOT EXISTS GIFT_TRANSFER (
 -- =============================================
 -- 5. OnceTransfer (일회성 축복 송금. Gift와 독립)
 -- =============================================
+-- 운영 DB에는 아래 ALTER로 점진 적용:
+--   ALTER TABLE ONCE_TRANSFER
+--     ADD COLUMN `status`        VARCHAR(16)  NOT NULL DEFAULT 'PENDING',
+--     ADD COLUMN `failureReason` VARCHAR(255) NULL,
+--     ADD COLUMN `completedAt`   DATETIME(6)  NULL;
 CREATE TABLE IF NOT EXISTS ONCE_TRANSFER (
     `onceTransferId`    BIGINT        NOT NULL AUTO_INCREMENT,
     `sender_id`         BIGINT        NOT NULL,
@@ -77,6 +82,9 @@ CREATE TABLE IF NOT EXISTS ONCE_TRANSFER (
     `amount`            DECIMAL(15,2) NOT NULL,
     `message`           VARCHAR(250)  NULL,
     `sentAt`            DATETIME(6)   NOT NULL,
+    `status`            VARCHAR(16)   NOT NULL DEFAULT 'PENDING',
+    `failureReason`     VARCHAR(255)  NULL,
+    `completedAt`       DATETIME(6)   NULL,
     `createdAt`         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updatedAt`         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`onceTransferId`),
@@ -112,7 +120,7 @@ INSERT IGNORE INTO GIFT_TRANSFER (`transferId`, `gift_id`, `transferDate`, `amou
 (3, 2, '2026-04-10',  50000, 'SUCCESS', NULL),
 (4, 3, '2026-04-05',  10000, 'SUCCESS', NULL);
 
--- OnceTransfer: 메시지 있는 케이스 1건 + 없는 케이스 1건
-INSERT IGNORE INTO ONCE_TRANSFER (`onceTransferId`, `sender_id`, `fromAccountId`, `toAccountNumber`, `amount`, `message`, `sentAt`) VALUES
-(1, 1, 1, '111-222-333333', 50000, '응원해, 항상 건강하길 기도해.', '2026-04-18 10:30:00.000000'),
-(2, 2, 2, '444-555-666666', 30000, NULL,                              '2026-04-19 09:15:00.000000');
+-- OnceTransfer: 메시지 있는 케이스 1건 + 없는 케이스 1건 (과거 이력은 SUCCESS 상태)
+INSERT IGNORE INTO ONCE_TRANSFER (`onceTransferId`, `sender_id`, `fromAccountId`, `toAccountNumber`, `amount`, `message`, `sentAt`, `status`, `completedAt`) VALUES
+(1, 1, 1, '111-222-333333', 50000, '응원해, 항상 건강하길 기도해.', '2026-04-18 10:30:00.000000', 'SUCCESS', '2026-04-18 10:30:00.500000'),
+(2, 2, 2, '444-555-666666', 30000, NULL,                              '2026-04-19 09:15:00.000000', 'SUCCESS', '2026-04-19 09:15:00.500000');
