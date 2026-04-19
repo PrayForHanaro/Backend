@@ -27,12 +27,12 @@ public class UserController {
 	private final StorageService storageService;
 
 	@GetMapping("/me/home")
-	public ApiResponse<UserHomeResponseDTO> getHome(@AuthenticationPrincipal CustomUserDetails user) {
+	public ApiResponse getHome(@AuthenticationPrincipal CustomUserDetails user) {
 		return ApiResponse.ok(userService.getHomeInfo(user.getUserId()));
 	}
 
 	@GetMapping("/me/givingOnce")
-	public ApiResponse<UserGivingResponseDTO> getGiving(@AuthenticationPrincipal CustomUserDetails user) {
+	public ApiResponse getGiving(@AuthenticationPrincipal CustomUserDetails user) {
 		return ApiResponse.ok(userService.getGivingInfo(user.getUserId()));
 	}
 
