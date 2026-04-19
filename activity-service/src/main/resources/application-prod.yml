@@ -11,6 +11,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    defer-datasource-initialization: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${SPRING_DATASOURCE_URL_}
@@ -18,4 +21,5 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
   sql:
     init:
-      mode: never
+      mode: always
+      schema-locations: classpath:sql/init.sql

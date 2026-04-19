@@ -4,6 +4,12 @@ import com.hanaro.apigateway.security.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.*;
+import com.hanaro.apigateway.security.CookieTokenResolver;
+import com.hanaro.apigateway.security.CustomJwtAuthenticationConverter;
+import com.hanaro.apigateway.security.JwtAccessDeniedHandler;
+import com.hanaro.apigateway.security.JwtAuthenticationEntryPoint;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -64,14 +70,21 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(s ->
-                        s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(entryPoint)
                         .accessDeniedHandler(deniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/health", "/info").permitAll()
+                        .requestMatchers(
+                                "/health",
+                                "/info",
+                                "/actuator/health",
+                                "/actuator/info",
+                                "/apis/user/users/signup",
+                                "/apis/auth/login",
+                                "/apis/auth/refresh"
+                        ).permitAll()
                         .requestMatchers("/apis/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
