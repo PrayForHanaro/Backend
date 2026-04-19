@@ -157,6 +157,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://org-db:3306/org_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET}
+      INTERNAL_VALID_API_KEYS: ${INTERNAL_VALID_API_KEYS}
+      INTERNAL_API_KEY: ${ORG_SERVICE_INTERNAL_API_KEY}
+
     depends_on:
       org-db:
         condition: service_healthy
@@ -176,6 +180,9 @@ services:
       AWS_SECRET_KEY: ${AWS_SECRET_KEY}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET}
       AWS_REGION: ${AWS_REGION}
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET}
+      INTERNAL_VALID_API_KEYS: ${INTERNAL_VALID_API_KEYS}
+      INTERNAL_API_KEY: ${USER_SERVICE_INTERNAL_API_KEY}
     depends_on:
       user-db:
         condition: service_healthy
@@ -192,6 +199,9 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET}
+      INTERNAL_VALID_API_KEYS: ${INTERNAL_VALID_API_KEYS}
+      INTERNAL_API_KEY: ${OFFERING_SERVICE_INTERNAL_API_KEY}
     depends_on:
       offering-db:
         condition: service_healthy
@@ -215,6 +225,9 @@ services:
       AWS_SECRET_KEY: ${AWS_SECRET_KEY}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET}
       AWS_REGION: ${AWS_REGION}
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET}
+      INTERNAL_VALID_API_KEYS: ${INTERNAL_VALID_API_KEYS}
+      INTERNAL_API_KEY: ${ACTIVITY_SERVICE_INTERNAL_API_KEY}
     depends_on:
       activity-db:
         condition: service_healthy
@@ -233,6 +246,9 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET}
+      INTERNAL_VALID_API_KEYS: ${INTERNAL_VALID_API_KEYS}
+      INTERNAL_API_KEY: ${PRAYER_SERVICE_INTERNAL_API_KEY}
     depends_on:
       prayer-db:
         condition: service_healthy
@@ -253,6 +269,7 @@ services:
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
       JWT_COOKIE_NAME: ${JWT_COOKIE_NAME}
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET}
     depends_on:
       kafka:
         condition: service_healthy
