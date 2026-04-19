@@ -1,4 +1,4 @@
-package com.hanaro.activityservice.config;
+package com.hanaro.userservice.config;
 
 import com.hanaro.common.security.InternalRequestSecurityFilter;
 import com.hanaro.common.security.InternalRequestSigner;
@@ -12,13 +12,20 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityConfig {
+public class UserSecurityConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public InternalRequestSecurityFilter internalRequestSecurityFilter(
@@ -30,13 +37,16 @@ public class SecurityConfig {
                 signer,
                 hmacSecret,
                 new HashSet<>(validApiKeys),
-                Set.of(),
+                Set.of(
+                        "/apis/user/users/signup",
+                        "/apis/user/users/login"
+                ),
                 300
         );
     }
 
     @Bean
-    public SecurityFilterChain filterChain(
+    public SecurityFilterChain userSecurityFilterChain(
             HttpSecurity http,
             InternalRequestSecurityFilter internalRequestSecurityFilter
     ) throws Exception {
@@ -48,7 +58,13 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
+                        .requestMatchers(
+                                "/apis/user/users/signup",
+                                "/apis/user/users/login",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/actuator/**"
+                        ).permitAll()
                         .requestMatchers("/internal/**").permitAll()
                         .requestMatchers("/apis/**").authenticated()
                         .anyRequest().denyAll()
