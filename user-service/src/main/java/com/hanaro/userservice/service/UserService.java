@@ -38,7 +38,7 @@ public class UserService {
   @Transactional
   public void signUp(SignUpRequestDTO request) {
 
-      if (userRepository.existsByPhone(request.getPhoneNumber())) {
+      if (userRepository.existsByPhone(request.getPhone())) {
         throw new SignUpFailException();
       }
 
@@ -47,7 +47,7 @@ public class UserService {
       User user = User.builder()
           .name(request.getName())
           .birthDate(request.getBirth())
-          .phone(request.getPhoneNumber())
+          .phone(request.getPhone())
           .password(encodedPassword)
           .build();
 
