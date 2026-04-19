@@ -1,14 +1,13 @@
 package com.hanaro.userservice.service;
 
+import com.hanaro.common.exception.ErrorCode;
 import com.hanaro.userservice.domain.*;
+import com.hanaro.userservice.dto.request.LoginRequestDTO;
 import com.hanaro.userservice.dto.request.UsePointRequest;
 import com.hanaro.userservice.client.OrgClient;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
-import com.hanaro.userservice.dto.response.OrgMyPageResponseDTO;
-import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
-import com.hanaro.userservice.dto.response.UserHomeResponseDTO;
-import com.hanaro.userservice.dto.response.UserMyPageResponseDTO;
-import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
+import com.hanaro.userservice.dto.response.*;
+import com.hanaro.userservice.exception.UserNotFoundException;
 import com.hanaro.userservice.mapper.UserMapper;
 import com.hanaro.userservice.repository.PointRepository;
 import com.hanaro.userservice.repository.UserRepository;
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,4 +100,20 @@ public class UserService {
         user.updateProfileUrl(profileUrl);
     }
 
+
+    public LoginResponseDTO verify(LoginRequestDTO request) {
+        User user = userRepository.findByPhone(request.phone())
+                .orElseThrow(() -> new IllegalArgumentException("전화번호 및 비밀번호가 일치하지 않습니다."));
+
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new IllegalArgumentException("전화번호 및 비밀번호가 일치하지 않습니다.");
+        }
+
+        return new LoginResponseDTO(
+                user.getUserId().toString(),
+                user.getName(),
+                user.getRole(),
+                user.getOrgId()
+        );
+    }
 }

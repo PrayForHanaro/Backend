@@ -33,8 +33,15 @@ public class SecurityConfig {
             "/apis/auth/**",    // 경로명(api vs apis) 통일 확인 필요
             "/api/public/**",
             "/health",
-            "/error"
-        )
+            "/error",
+            "/actuator/health",
+            "/actuator/info",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/apis/user/users/signup",
+            "/apis/user/users/login"
+                )
         .csrf(csrf -> csrf.disable())
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
