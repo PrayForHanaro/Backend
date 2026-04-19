@@ -42,6 +42,7 @@ public class GiftService {
         LocalDate today = LocalDate.now(KST);
         return giftRepository.findAllBySenderIdAndIsActiveTrue(userId).stream()
                 .map(g -> new GiftReceiverResponse(
+                        g.getGiftId(),
                         g.getReceiverId(),
                         g.getGiftReceiverType().name(),
                         g.getAmount(),

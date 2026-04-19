@@ -8,6 +8,7 @@ import java.math.BigDecimal;
  * 대상자 이름·imageType 은 user-service 와의 BFF 조합 단계에서 추가됨.
  */
 public record GiftReceiverResponse(
+        Long giftId,
         Long receiverId,
         String relation,
         BigDecimal monthlyAmount,
