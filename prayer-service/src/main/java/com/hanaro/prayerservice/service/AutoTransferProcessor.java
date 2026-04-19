@@ -7,12 +7,12 @@ import com.hanaro.prayerservice.domain.GiftTransfer;
 import com.hanaro.prayerservice.domain.PointType;
 import com.hanaro.prayerservice.domain.TransferStatus;
 import com.hanaro.prayerservice.event.PointEarnEvent;
-import com.hanaro.prayerservice.kafka.PointEarnPublisher;
 import com.hanaro.prayerservice.repository.GiftRepository;
 import com.hanaro.prayerservice.repository.GiftTransferRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ public class AutoTransferProcessor {
     private final GiftRepository giftRepository;
     private final GiftTransferRepository giftTransferRepository;
     private final UserClient userClient;
-    private final PointEarnPublisher pointEarnPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processOne(Long giftId, LocalDate date) {
@@ -69,7 +69,7 @@ public class AutoTransferProcessor {
             long earnedPoint = amount.multiply(RECURRING_POINT_RATE)
                     .setScale(0, RoundingMode.FLOOR)
                     .longValue();
-            pointEarnPublisher.publish(PointEarnEvent.builder()
+            applicationEventPublisher.publishEvent(PointEarnEvent.builder()
                     .userId(gift.getSenderId())
                     .pointType(PointType.SAVINGS_RECURRING)
                     .amount(earnedPoint)
