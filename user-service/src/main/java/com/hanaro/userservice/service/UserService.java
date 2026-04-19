@@ -1,14 +1,11 @@
 package com.hanaro.userservice.service;
 
 import com.hanaro.userservice.domain.*;
+import com.hanaro.userservice.dto.request.LoginRequestDTO;
 import com.hanaro.userservice.dto.request.UsePointRequest;
 import com.hanaro.userservice.client.OrgClient;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
-import com.hanaro.userservice.dto.response.OrgMyPageResponseDTO;
-import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
-import com.hanaro.userservice.dto.response.UserHomeResponseDTO;
-import com.hanaro.userservice.dto.response.UserMyPageResponseDTO;
-import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
+import com.hanaro.userservice.dto.response.*;
 import com.hanaro.userservice.mapper.UserMapper;
 import com.hanaro.userservice.repository.PointRepository;
 import com.hanaro.userservice.repository.UserRepository;
@@ -98,6 +95,23 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         user.updateProfileUrl(profileUrl);
+    }
+
+    @Transactional(readOnly = true)
+    public LoginResponseDTO login(LoginRequestDTO request) {
+        User user = userRepository.findByPhone(request.getPhoneNumber())
+                .orElseThrow(() -> new IllegalArgumentException("전화번호 또는 비밀번호가 올바르지 않습니다."));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("전화번호 또는 비밀번호가 올바르지 않습니다.");
+        }
+
+        return LoginResponseDTO.builder()
+                .userId(user.getUserId())
+                .name(user.getName())
+                .role(user.getRole().name())
+                .orgId(user.getOrgId())
+                .build();
     }
 
 }

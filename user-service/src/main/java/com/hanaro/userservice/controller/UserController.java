@@ -1,14 +1,12 @@
 package com.hanaro.userservice.controller;
 
+import com.hanaro.userservice.dto.request.LoginRequestDTO;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
 import com.hanaro.common.response.ApiResponse;
 import com.hanaro.common.security.CustomUserDetails;
 import com.hanaro.common.storage.StorageService;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
-import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
-import com.hanaro.userservice.dto.response.UserHomeResponseDTO;
-import com.hanaro.userservice.dto.response.UserMyPageResponseDTO;
-import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
+import com.hanaro.userservice.dto.response.*;
 import com.hanaro.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -77,4 +75,9 @@ public class UserController {
 		return ApiResponse.ok(userService.getMyPageInfo(user.getUserId()));
 	}
 
+
+	@PostMapping("/login")
+	public ApiResponse<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+		return ApiResponse.ok(userService.login(request));
+	}
 }
