@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -14,5 +14,5 @@ import java.time.LocalDateTime;
 public class OnceTransferResponse {
 
     private String id;
-    private LocalDateTime sentAt;
+    private Instant sentAt;
 }

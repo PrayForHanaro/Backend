@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +46,7 @@ public class OnceTransferService {
                         .toAccountNumber(request.getAccountNumber())
                         .amount(amount)
                         .message(request.getMessage())
-                        .sentAt(LocalDateTime.now())
+                        .sentAt(Instant.now())
                         .build()
         );
 

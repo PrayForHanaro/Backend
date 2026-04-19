@@ -3,7 +3,7 @@ package com.hanaro.prayerservice.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * 일회성 축복 송금 이력 (BLESS_SPEC §5)
@@ -46,7 +46,7 @@ public class OnceTransfer extends BaseEntity {
     @Column(length = 250)
     private String message;
 
-    /** 송금 시각 */
+    /** 송금 시각 (UTC 기준 Instant; 계약 bless-api.md 의 ISO-8601 Z 포맷) */
     @Column(nullable = false)
-    private LocalDateTime sentAt;
+    private Instant sentAt;
 }
