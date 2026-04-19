@@ -25,7 +25,9 @@ public class UserSecurityConfig {
                         .requestMatchers(
                                 "/apis/user/users/signup",
                                 "/actuator/health",
-                                "/actuator/info"
+                                "/actuator/info",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );

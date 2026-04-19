@@ -4,16 +4,11 @@ import com.hanaro.apigateway.security.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.*;
-import com.hanaro.apigateway.security.CookieTokenResolver;
-import com.hanaro.apigateway.security.CustomJwtAuthenticationConverter;
-import com.hanaro.apigateway.security.JwtAccessDeniedHandler;
-import com.hanaro.apigateway.security.JwtAuthenticationEntryPoint;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+
 
 @Configuration
 public class SecurityConfig {
@@ -23,20 +18,9 @@ public class SecurityConfig {
     return web -> web.ignoring()
         .requestMatchers(
             "/swagger-custom.js",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/webjars/**",
-            "/static/**",
             "/favicon.ico",
-            "/*.html",
-            "/v3/api-docs/**",
-            "/api-docs/**",
-            "/swagger-resources/**",
-            "/org/v3/api-docs",
-            "/offering/v3/api-docs",
-            "/activity/v3/api-docs",
-            "/prayer/v3/api-docs",
-            "/user/v3/api-docs"
+            "/webjars/**",
+            "/static/**"
         );
   }
 
@@ -46,11 +30,10 @@ public class SecurityConfig {
 
     http
         .securityMatcher(
-            "/api/auth/**",
+            "/apis/auth/**",    // 경로명(api vs apis) 통일 확인 필요
             "/api/public/**",
-            "/api/actuator/**",
-            "/error",
-            "/broadcast/**"
+            "/health",
+            "/error"
         )
         .csrf(csrf -> csrf.disable())
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -76,15 +59,6 @@ public class SecurityConfig {
                         .accessDeniedHandler(deniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/health",
-                                "/info",
-                                "/actuator/health",
-                                "/actuator/info",
-                                "/apis/user/users/signup",
-                                "/apis/auth/login",
-                                "/apis/auth/refresh"
-                        ).permitAll()
                         .requestMatchers("/apis/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
