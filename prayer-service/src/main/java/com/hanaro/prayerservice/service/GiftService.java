@@ -11,10 +11,10 @@ import com.hanaro.prayerservice.dto.SavingsJoinResponse;
 import com.hanaro.prayerservice.event.PointEarnEvent;
 import com.hanaro.prayerservice.exception.PrayerErrorCode;
 import com.hanaro.prayerservice.exception.PrayerException;
-import com.hanaro.prayerservice.kafka.PointEarnPublisher;
 import com.hanaro.prayerservice.repository.GiftRepository;
 import com.hanaro.prayerservice.repository.SavingsProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +36,7 @@ public class GiftService {
     private final GiftRepository giftRepository;
     private final SavingsProductRepository savingsProductRepository;
     private final UserClient userClient;
-    private final PointEarnPublisher pointEarnPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public List<GiftReceiverResponse> getMyReceivers(Long userId) {
         LocalDate today = LocalDate.now(KST);
@@ -86,7 +86,7 @@ public class GiftService {
                 .build();
         Gift saved = giftRepository.save(gift);
 
-        pointEarnPublisher.publish(PointEarnEvent.builder()
+        applicationEventPublisher.publishEvent(PointEarnEvent.builder()
                 .userId(senderId)
                 .pointType(PointType.SAVINGS_JOIN)
                 .amount(SAVINGS_JOIN_POINT)
