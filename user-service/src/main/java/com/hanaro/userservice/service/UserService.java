@@ -8,6 +8,7 @@ import com.hanaro.userservice.client.OrgClient;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
 import com.hanaro.userservice.dto.response.*;
 import com.hanaro.userservice.exception.LoginFailException;
+import com.hanaro.userservice.exception.SignUpFailException;
 import com.hanaro.userservice.exception.UserNotFoundException;
 import com.hanaro.userservice.mapper.UserMapper;
 import com.hanaro.userservice.repository.PointRepository;
@@ -18,11 +19,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -37,7 +40,7 @@ public class UserService {
   public void signUp(SignUpRequestDTO request) {
 
       if (userRepository.existsByPhone(request.getPhoneNumber())) {
-        throw new IllegalArgumentException("이미 가입된 번호입니다.");
+        throw new SignUpFailException();
       }
 
       String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -54,13 +57,13 @@ public class UserService {
 
     public UserHomeResponseDTO getHomeInfo(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException());
         return userMapper.toUserHomeResponseDTO(user);
     }
 
     public UserGivingResponseDTO getGivingInfo(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException());
         return userMapper.toUserGivingResponseDTO(user);
     }
 
@@ -107,6 +110,7 @@ public class UserService {
                 .orElseThrow(() -> new LoginFailException());
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            log.error("비번 불일치");
             throw new LoginFailException();
         }
 
