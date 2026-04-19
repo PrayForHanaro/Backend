@@ -6,6 +6,8 @@ import com.hanaro.common.storage.StorageService;
 import com.hanaro.userservice.dto.request.LoginRequestDTO;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
 import com.hanaro.userservice.dto.response.LoginResponseDTO;
+import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
+import com.hanaro.userservice.dto.response.UserHomeResponseDTO;
 import com.hanaro.userservice.dto.response.UserMyPageResponseDTO;
 import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
 import com.hanaro.userservice.service.UserService;
@@ -29,19 +31,25 @@ public class UserController {
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/me/home")
-	public ApiResponse<?> getHome(@AuthenticationPrincipal CustomUserDetails user) {
+	public ApiResponse<UserHomeResponseDTO> getHome(
+			@AuthenticationPrincipal CustomUserDetails user
+	) {
 		return ApiResponse.ok(userService.getHomeInfo(user.getUserId()));
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/me/givingOnce")
-	public ApiResponse<?> getGiving(@AuthenticationPrincipal CustomUserDetails user) {
+	public ApiResponse<UserGivingResponseDTO> getGiving(
+			@AuthenticationPrincipal CustomUserDetails user
+	) {
 		return ApiResponse.ok(userService.getGivingInfo(user.getUserId()));
 	}
 
 	@PreAuthorize("hasAnyRole('ADMIN', 'CLERGY')")
 	@GetMapping("/list")
-	public ApiResponse<List<UserSimpleResponseDTO>> getList(@RequestParam List<Long> ids) {
+	public ApiResponse<List<UserSimpleResponseDTO>> getList(
+			@RequestParam List<Long> ids
+	) {
 		return ApiResponse.ok(userService.getUserList(ids));
 	}
 
