@@ -24,6 +24,7 @@ public class UserSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/apis/user/users/signup",
+                                "/apis/user/users/login",
                                 "/actuator/health",
                                 "/actuator/info",
                                 "/swagger-ui/**",
