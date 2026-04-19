@@ -20,8 +20,8 @@ public class FeignHeaderInterceptor implements RequestInterceptor {
 
         HttpServletRequest request = attrs.getRequest();
 
-        copy(request, template, "X-User-Id");
-        copy(request, template, "X-User-Role");
+        copy(request, template, "X-Auth-User-Id");
+        copy(request, template, "X-Auth-User-Role");
     }
 
     private void copy(HttpServletRequest req, RequestTemplate template, String name) {
