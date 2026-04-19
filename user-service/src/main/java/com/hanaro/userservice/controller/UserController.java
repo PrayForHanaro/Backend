@@ -29,13 +29,13 @@ public class UserController {
 	private final StorageService storageService;
 
 	@GetMapping("/me/home")
-	public ApiResponse<UserHomeResponseDTO> getHome(@RequestHeader("X-Auth-User-Id") Long userId) {
-		return ApiResponse.ok(userService.getHomeInfo(userId));
+	public ApiResponse<UserHomeResponseDTO> getHome(@AuthenticationPrincipal CustomUserDetails user) {
+		return ApiResponse.ok(userService.getHomeInfo(user.getUserId()));
 	}
 
 	@GetMapping("/me/givingOnce")
-	public ApiResponse<UserGivingResponseDTO> getGiving(@RequestHeader("X-Auth-User-Id") Long userId) {
-		return ApiResponse.ok(userService.getGivingInfo(userId));
+	public ApiResponse<UserGivingResponseDTO> getGiving(@AuthenticationPrincipal CustomUserDetails user) {
+		return ApiResponse.ok(userService.getGivingInfo(user.getUserId()));
 	}
 
 	@GetMapping("/list")
