@@ -33,7 +33,18 @@ public class SecurityConfig {
             "/apis/auth/**",    // 경로명(api vs apis) 통일 확인 필요
             "/api/public/**",
             "/health",
-            "/error"
+            "/error",
+
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/swagger-config",
+
+            "/org/v3/api-docs",
+            "/user/v3/api-docs",
+            "/prayer/v3/api-docs",
+            "/offering/v3/api-docs",
+            "/activity/v3/api-docs"
         )
         .csrf(csrf -> csrf.disable())
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
