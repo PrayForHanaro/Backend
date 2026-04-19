@@ -66,7 +66,8 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     persistAuthorization: true
-    custom-js: /swagger-custom.js
+    disable-swagger-default-url: true
+    display-query-params-with-default: true
     urls:
       - name: org-service
         url: /org/v3/api-docs
