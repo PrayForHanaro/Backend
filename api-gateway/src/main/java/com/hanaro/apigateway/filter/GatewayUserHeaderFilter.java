@@ -1,12 +1,14 @@
 package com.hanaro.apigateway.filter;
 
+import com.hanaro.common.security.InternalRequestSigner;
+import com.hanaro.common.security.InternalSecurityHeaders;
+import java.time.Instant;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -15,47 +17,103 @@ import org.springframework.web.servlet.function.ServerRequest;
 @Configuration
 public class GatewayUserHeaderFilter {
 
+    private final InternalRequestSigner signer;
+    private final String hmacSecret;
+
+    public GatewayUserHeaderFilter(
+            InternalRequestSigner signer,
+            @Value("${security.internal.hmac-secret}") String hmacSecret
+    ) {
+        this.signer = signer;
+        this.hmacSecret = hmacSecret;
+    }
+
     @Bean
     public Function<ServerRequest, ServerRequest> addInternalUserHeaders() {
         return request -> {
             ServerRequest.Builder builder = ServerRequest.from(request);
 
-            // 1) spoofing 가능한 외부 헤더 제거
             builder.headers(headers -> {
-                headers.remove("X-Auth-User-Id");
-                headers.remove("X-Auth-User-Name");
-                headers.remove("X-Auth-User-Role");
-                headers.remove("X-Auth-Org-Id");
+                headers.remove(InternalSecurityHeaders.X_AUTH_USER_ID);
+                headers.remove(InternalSecurityHeaders.X_AUTH_USER_NAME);
+                headers.remove(InternalSecurityHeaders.X_AUTH_USER_ROLE);
+                headers.remove(InternalSecurityHeaders.X_AUTH_ORG_ID);
+                headers.remove(InternalSecurityHeaders.X_FROM_GATEWAY);
+                headers.remove(InternalSecurityHeaders.X_CALLER_SERVICE);
+                headers.remove(InternalSecurityHeaders.X_INTERNAL_API_KEY);
+                headers.remove(InternalSecurityHeaders.X_INTERNAL_TIMESTAMP);
+                headers.remove(InternalSecurityHeaders.X_INTERNAL_SIGNATURE);
             });
 
-            // 2) SecurityContext에서 현재 인증 정보 꺼내기
             Authentication authentication =
                     org.springframework.security.core.context.SecurityContextHolder
                             .getContext()
                             .getAuthentication();
 
-            if (!(authentication instanceof JwtAuthenticationToken jwtAuth)
-                    || !authentication.isAuthenticated()) {
-                return builder.build();
+            String userId = "";
+            String userName = "";
+            String orgId = "";
+            String userRole = "";
+
+            if (authentication instanceof JwtAuthenticationToken jwtAuth && authentication.isAuthenticated()) {
+                var jwt = jwtAuth.getToken();
+
+                userId = jwt.getSubject();
+                userName = jwt.getClaimAsString("name");
+                orgId = jwt.getClaimAsString("org_id");
+
+                List<String> roles = authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .map(role -> role.startsWith("ROLE_") ? role.substring(5) : role)
+                        .collect(Collectors.toList());
+
+                userRole = String.join(",", roles);
             }
 
-            var jwt = jwtAuth.getToken();
+            String timestamp = String.valueOf(Instant.now().getEpochSecond());
+            String fromGateway = "true";
+            String callerService = "api-gateway";
+            String path = request.uri().getPath();
 
-            String userId = jwt.getSubject();
-            String userName = jwt.getClaimAsString("name");
-            String orgId = jwt.getClaimAsString("org_id");
+            String signature = signer.sign(
+                    hmacSecret,
+                    request.method().name(),
+                    path,
+                    timestamp,
+                    userId,
+                    userRole,
+                    orgId,
+                    fromGateway,
+                    callerService,
+                    ""
+            );
 
-            List<String> roles = authentication.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .map(role -> role.startsWith("ROLE_") ? role.substring(5) : role)
-                    .collect(Collectors.toList());
+            String finalUserId = userId;
+            String finalUserName = userName;
+            String finalOrgId = orgId;
+            String finalUserRole = userRole;
 
-            // 3) 내부 헤더 재주입
             builder.headers(headers -> {
-                if (userId != null) headers.set("X-Auth-User-Id", userId);
-                if (userName != null) headers.set("X-Auth-User-Name", userName);
-                if (orgId != null) headers.set("X-Auth-Org-Id", orgId);
-                if (!roles.isEmpty()) headers.set("X-Auth-User-Role", String.join(",", roles));
+                if (finalUserId != null && !finalUserId.isBlank()) {
+                    headers.set(InternalSecurityHeaders.X_AUTH_USER_ID, finalUserId);
+                }
+
+                if (finalUserName != null && !finalUserName.isBlank()) {
+                    headers.set(InternalSecurityHeaders.X_AUTH_USER_NAME, finalUserName);
+                }
+
+                if (finalOrgId != null && !finalOrgId.isBlank()) {
+                    headers.set(InternalSecurityHeaders.X_AUTH_ORG_ID, finalOrgId);
+                }
+
+                if (finalUserRole != null && !finalUserRole.isBlank()) {
+                    headers.set(InternalSecurityHeaders.X_AUTH_USER_ROLE, finalUserRole);
+                }
+
+                headers.set(InternalSecurityHeaders.X_FROM_GATEWAY, fromGateway);
+                headers.set(InternalSecurityHeaders.X_CALLER_SERVICE, callerService);
+                headers.set(InternalSecurityHeaders.X_INTERNAL_TIMESTAMP, timestamp);
+                headers.set(InternalSecurityHeaders.X_INTERNAL_SIGNATURE, signature);
             });
 
             return builder.build();

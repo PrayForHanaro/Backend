@@ -32,3 +32,9 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     enabled: false
+
+security:
+  internal:
+    hmac-secret: ${INTERNAL_HMAC_SECRET}
+    api-key: ${INTERNAL_API_KEY:org-service-key}
+    valid-api-keys: ${INTERNAL_VALID_API_KEYS:user-service-key,activity-service-key,offering-service-key,prayer-service-key,org-service-key}

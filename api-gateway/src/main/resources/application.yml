@@ -103,6 +103,8 @@ jwt:
   cookie-name: ${JWT_COOKIE_NAME}
 
 security:
+  internal:
+    hmac-secret: ${INTERNAL_HMAC_SECRET}
   auth:
     permit-paths:
       - /health

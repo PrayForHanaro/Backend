@@ -1,6 +1,11 @@
 package com.hanaro.userservice.config;
 
-import com.hanaro.userservice.security.GatewayHeaderAuthenticationFilter;
+import com.hanaro.common.security.InternalRequestSecurityFilter;
+import com.hanaro.common.security.InternalRequestSigner;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,9 +26,27 @@ public class UserSecurityConfig {
     }
 
     @Bean
+    public InternalRequestSecurityFilter internalRequestSecurityFilter(
+            InternalRequestSigner signer,
+            @Value("${security.internal.hmac-secret}") String hmacSecret,
+            @Value("${security.internal.valid-api-keys}") List<String> validApiKeys
+    ) {
+        return new InternalRequestSecurityFilter(
+                signer,
+                hmacSecret,
+                new HashSet<>(validApiKeys),
+                Set.of(
+                        "/apis/user/users/signup",
+                        "/apis/user/users/login"
+                ),
+                300
+        );
+    }
+
+    @Bean
     public SecurityFilterChain userSecurityFilterChain(
             HttpSecurity http,
-            GatewayHeaderAuthenticationFilter gatewayHeaderAuthenticationFilter
+            InternalRequestSecurityFilter internalRequestSecurityFilter
     ) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
@@ -36,15 +59,16 @@ public class UserSecurityConfig {
                         .requestMatchers(
                                 "/apis/user/users/signup",
                                 "/apis/user/users/login",
-                                "/actuator/health",
-                                "/actuator/info",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/actuator/**"
                         ).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/internal/**").permitAll()
+                        .requestMatchers("/apis/**").authenticated()
+                        .anyRequest().denyAll()
                 )
                 .addFilterBefore(
-                        gatewayHeaderAuthenticationFilter,
+                        internalRequestSecurityFilter,
                         UsernamePasswordAuthenticationFilter.class
                 );
 
