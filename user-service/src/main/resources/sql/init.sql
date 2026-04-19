@@ -37,9 +37,23 @@ CREATE TABLE IF NOT EXISTS Account (
     CONSTRAINT fk_account_user FOREIGN KEY (`userId`) REFERENCES User (`userId`)
 );
 
-ALTER TABLE User
-    ADD CONSTRAINT fk_user_default_account FOREIGN KEY (`defaultAccountId`) REFERENCES Account (`accountId`);
+SET @fk_exists = (
+    SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+    WHERE CONSTRAINT_NAME = 'fk_user_default_account'
+    AND TABLE_NAME = 'User'
+    AND CONSTRAINT_SCHEMA = DATABASE()
+);
 
+SET @sql = IF(@fk_exists > 0,
+    'ALTER TABLE User DROP FOREIGN KEY fk_user_default_account',
+    'SELECT 1');
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+ALTER TABLE User ADD CONSTRAINT fk_user_default_account
+    FOREIGN KEY (`defaultAccountId`) REFERENCES Account (`accountId`);
 -- =============================================
 -- 3. Point (포인트 이력)
 -- =============================================

@@ -9,7 +9,9 @@ public enum UserErrorCode implements ErrorCode {
   DUPLICATE_USER("U002", "중복 유저", 400),
   INSUFFICIENT_BALANCE("U003", "잔액이 부족합니다", 400),
   FILE_UPLOAD_FAILED("U004", "파일 업로드에 실패했습니다", 500),
-  ACCOUNT_NOT_FOUND("U005", "계좌를 찾을 수 없습니다", 404);
+  ACCOUNT_NOT_FOUND("U005", "계좌를 찾을 수 없습니다", 404),
+  LOGIN_FAIL("U003", "전화번호 및 비밀번호가 일치하지 않습니다.", 401),
+  USER_ALREADY_EXIST("U004", "이미 존재하는 회원입니다.", 409);
 
   private final String code;
   private final String message;
