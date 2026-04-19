@@ -26,6 +26,7 @@ public class OnceTransferService {
 
     private final UserClient userClient;
     private final OnceTransferStatusWriter statusWriter;
+    private final RegisteredAccountService registeredAccountService;
 
     public OnceTransferResponse send(Long senderId, OnceTransferRequest request) {
         UserGivingResponse giving = userClient.getGivingInfo().getData();
@@ -62,6 +63,14 @@ public class OnceTransferService {
 
         Instant completedAt = Instant.now();
         statusWriter.markSuccess(id, completedAt);
+
+        // 송금은 이미 성공 확정. 즐겨찾기 기록은 best-effort — 실패해도 응답 흐름 유지
+        try {
+            registeredAccountService.registerOrTouch(senderId, request.getAccountNumber());
+        } catch (Exception e) {
+            log.warn("[OnceTransfer] registerOrTouch failed onceTransferId={} accountNumber={}",
+                    id, request.getAccountNumber(), e);
+        }
 
         return OnceTransferResponse.builder()
                 .id(String.valueOf(id))
