@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -46,7 +47,8 @@ public class GiftService {
                         g.getAmount(),
                         g.getCumulativeTotal(),
                         (int) ChronoUnit.DAYS.between(
-                                g.getCreatedAt().atZone(KST).toLocalDate(), today) + 1))
+                                g.getCreatedAt().toInstant(ZoneOffset.UTC).atZone(KST).toLocalDate(),
+                                today) + 1))
                 .toList();
     }
 
