@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "ACTIVITY")
+@Table(name = "Activity")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -35,66 +35,67 @@ public class Activity extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long activityId;
 
-	@Column(nullable = false)
-	private Long orgId;         // FK 없음 (org_db)
+	@Column(name = "orgId", nullable = false)
+	private Long orgId;
 
-	@Column(nullable = false)
-	private Long creatorId;     // FK 없음 (user_db)
-
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20)
-	private ActivityCategory activityCategory;  // 봉사모집/동행찾기/교회행사
+	@Column(name = "creatorId", nullable = false)
+	private Long creatorId;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20)
-	private ActivityType activityType;      // 일회성/정기
+	@Column(name = "activityCategory", nullable = false, length = 20)
+	private ActivityCategory activityCategory;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20)
+	@Column(name = "activityType", nullable = false, length = 20)
+	private ActivityType activityType;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "activityState", nullable = false, length = 20)
 	@Builder.Default
 	private ActivityState activityState = ActivityState.RECRUITING;
 
-	@Column(nullable = false, length = 100)
+	@Column(name = "title", nullable = false, length = 100)
 	private String title;
 
-	@Column(columnDefinition = "TEXT")
+	@Column(name = "description", columnDefinition = "TEXT")
 	private String description;
 
-	@Column(length = 255)
+	@Column(name = "location", length = 255)
 	private String location;
 
-	@Column(nullable = false)
+	@Column(name = "maxMembers", nullable = false)
 	private int maxMembers;
 
-	@Column(nullable = false)
-	private LocalDateTime startAt; // 정기, 비정기 모두 시간 설정 필수
+	@Column(name = "startAt", nullable = false)
+	private LocalDateTime startAt;
 
-	@Column(nullable = false)
-	private LocalDateTime endAt; // 정기, 비정기 모두 시간 설정 필수
+	@Column(name = "endAt", nullable = false)
+	private LocalDateTime endAt;
 
 	@Enumerated(EnumType.STRING)
-	private RecurrenceType recurrence;      // 정기일 경우에만 선택. 매일/매주/매월
+	@Column(name = "recurrence")
+	private RecurrenceType recurrence;
 
 	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(
-			name = "ACTIVITY_RECURRENCE_DAY",
-			joinColumns = @JoinColumn(name = "activity_id")
+			name = "ActivityRecurrenceDay",
+			joinColumns = @JoinColumn(name = "activityId")
 	)
 	@Enumerated(EnumType.STRING)
-	@Column(name = "recurrence_day")
+	@Column(name = "recurrenceDay")
 	@Builder.Default
-	private List<DayOfWeekType> recurrenceDays = new ArrayList<>(); // 정기-매주인 경우 설정
+	private List<DayOfWeekType> recurrenceDays = new ArrayList<>();
 
 	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(
-			name = "ACTIVITY_RECURRENCE_MONTH_DAY",
-			joinColumns = @JoinColumn(name = "activity_id")
+			name = "ActivityRecurrenceMonthDay",
+			joinColumns = @JoinColumn(name = "activityId")
 	)
-	@Column(name = "recurrence_month_day")
+	@Column(name = "recurrenceMonthDay")
 	@Builder.Default
-	private List<Integer> recurrenceMonthDays = new ArrayList<>(); // 정기-매월인 경우 설정
+	private List<Integer> recurrenceMonthDays = new ArrayList<>();
 
-	@Column(nullable = false)
+	@Column(name = "pointAmount", nullable = false)
 	private int pointAmount;
 
 	@OneToMany(mappedBy = "activity", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)

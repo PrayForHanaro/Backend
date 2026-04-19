@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "ACCOUNT")
+@Table(name = "Account")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -22,30 +22,31 @@ public class Account extends  BaseEntity {
 	private Long accountId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = true)
+	@JoinColumn(name = "userId", nullable = true)
 	private User user;
 
-	@Column(nullable = false, length = 50)
+	@Column(name = "bankName", nullable = false, length = 50)
 	private String bankName;
 
-	@Column(nullable = false, unique = true, length = 30)
+	@Column(name = "accountNumber", nullable = false, unique = true, length = 30)
 	private String accountNumber;
 
 	/** 잔액 */
-	@Column(nullable = false)
+	@Column(name = "balance", nullable = false)
 	@Builder.Default
 	private BigDecimal balance = BigDecimal.ZERO;
 
-	@Column(nullable = false)
+	@Column(name = "isHana", nullable = false)
 	private boolean isHana;
 
-	@Column(nullable = false)
+	@Column(name = "isDefault", nullable = false)
 	private boolean isDefault;
 
-	@Column(nullable = false)
+	@Column(name = "isSavings", nullable = false)
 	private boolean isSavings;
 
 	@Version
+	@Column(name = "version")
 	private Long version;
 
 	public void setAsDefault() {

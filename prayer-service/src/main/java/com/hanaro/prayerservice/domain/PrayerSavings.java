@@ -16,7 +16,7 @@ import org.hibernate.annotations.OnDeleteAction;
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "PRAYER_SAVINGS")
+@Table(name = "PrayerSavings")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -25,7 +25,7 @@ public class PrayerSavings extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(columnDefinition = "int unsigned")
+	@Column(name = "prayerSavingsId", columnDefinition = "int unsigned")
 	private Long prayerSavingsId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -35,16 +35,13 @@ public class PrayerSavings extends BaseEntity {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Gift gift;
 
-	/** 기도문  */
-	@Column(nullable = false, length = 100)
+	@Column(name = "prayerContent", nullable = false, length = 100)
 	private String prayerContent;
 
-	/** 시작일 */
-	@Column(nullable = false)
+	@Column(name = "startDate", nullable = false)
 	private LocalDate startDate;
 
-	/** D+N 현재 경과일수 */
-	@Column(nullable = false)
+	@Column(name = "dDay", nullable = false)
 	private int dDay;
 
 

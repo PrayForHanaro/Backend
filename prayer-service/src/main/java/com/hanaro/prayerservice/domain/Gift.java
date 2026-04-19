@@ -15,7 +15,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "GIFT")
+@Table(name = "Gift")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -23,46 +23,38 @@ import java.util.List;
 public class Gift extends  BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(columnDefinition = "int unsigned")
+	@Column(name = "giftId", columnDefinition = "int unsigned")
 	private Long giftId;
 
-	/** 보내는 사람 ID (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "senderId", nullable = false)
 	private Long senderId;
 
-	/** 받는 사람 ID (user_db 참조, FK 없음) */
-	@Column(nullable = true) /** 가입하지 않은 사용자에게 보낼 경우 null 처리 */
+	@Column(name = "receiverId")
 	private Long receiverId;
 
 	@Enumerated(EnumType.STRING)
+	@Column(name = "giftReceiverType")
 	private GiftReceiverType giftReceiverType;
 
-	/** 출금 계좌 ID - 나의 대표 헌금계좌 (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "fromAccountId", nullable = false)
 	private Long fromAccountId;
 
-	/** 입금 계좌 ID - 상대방 적금계좌 (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "toSavingsAccountId", nullable = false)
 	private Long toSavingsAccountId;
 
-	/** 매달 자동이체 금액 */
-	@Column(nullable = false)
+	@Column(name = "amount", nullable = false)
 	private BigDecimal amount;
 
-	/** 자동이체 활성화 여부 */
-	@Column(nullable = false)
+	@Column(name = "isActive", nullable = false)
 	private boolean isActive;
 
-	/** 이 시점까지의 누적 송금 총액 */
-	@Column(nullable = false)
+	@Column(name = "cumulativeTotal", nullable = false)
 	private BigDecimal cumulativeTotal;
 
-	/** 적금 상품 이름 */
-	@Column(nullable = false)
+	@Column(name = "savingsProductName", nullable = false)
 	private String savingsProductName;
 
-	/** 적금 상품 혜택률 */
-	@Column(nullable = false)
+	@Column(name = "interestRate", nullable = false)
 	private BigDecimal interestRate;
 
 
