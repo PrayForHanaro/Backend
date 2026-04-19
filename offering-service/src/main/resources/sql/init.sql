@@ -56,6 +56,8 @@ CREATE TABLE IF NOT EXISTS Pension (
 
 -- =============================================
 -- SEED DATA (INSERT IGNORE 사용)
+-- OfferingType: 십일조, 감사헌금, 선교헌금, 건축헌금, 기타
+-- PensionType: 국민연금, 퇴직연금, 개인연금
 -- =============================================
 INSERT IGNORE INTO Offering (`offeringId`, `userId`, `orgId`, `accountId`, `offeringType`, `amount`, `offererName`, `prayerContent`, `usedPoint`) VALUES
 (1, 2, 2, 2, '십일조', 200000, '유저1', '4월의 첫 열매를 드립니다.', 0),
@@ -70,6 +72,6 @@ INSERT IGNORE INTO RecurringOffering (`recurringId`, `userId`, `accountId`, `org
 (2, 3, 3, 1, '선교헌금', 50000, '2026-02-01', '2026-05-01');
 
 INSERT IGNORE INTO Pension (`pensionId`, `userId`, `pensionType`, `isHanaBank`, `totalContribution`, `profit`, `returnRate`, `institutionName`) VALUES
-(1, 2, 'PERSONAL', 1, 10000000, 1500000, 15.0, '하나은행'),
-(2, 2, 'NATIONAL', 0, 5000000, 200000, 4.0, '국민연금공단'),
-(3, 3, 'RETIREMENT', 1, 15000000, 2000000, 13.3, '하나은행');
+(1, 2, '개인연금', 1, 10000000, 1500000, 15.0, '하나은행'),
+(2, 2, '국민연금', 0, 5000000, 200000, 4.0, '국민연금공단'),
+(3, 3, '퇴직연금', 1, 15000000, 2000000, 13.3, '하나은행');

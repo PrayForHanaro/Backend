@@ -23,25 +23,25 @@ CREATE TABLE IF NOT EXISTS Gift (
 -- =============================================
 CREATE TABLE IF NOT EXISTS PrayerSavings (
     `prayerSavingsId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `giftId`              INT UNSIGNED NOT NULL,
+    `giftId`            INT UNSIGNED NOT NULL,
     `prayerContent`    VARCHAR(100) NOT NULL,
     `startDate`        DATE         NOT NULL,
     `dDay`             INT          NOT NULL DEFAULT 0,
     `createdAt`        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updatedAt`        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`prayerSavingsId`),
-    CONSTRAINT fk_prayer_savings_gift FOREIGN KEY (`gift`) REFERENCES Gift (`giftId`) ON DELETE CASCADE
+    CONSTRAINT fk_prayer_savings_gift FOREIGN KEY (`giftId`) REFERENCES Gift (`giftId`) ON DELETE CASCADE
 );
 
 -- =============================================
 -- SEED DATA (INSERT IGNORE 사용)
 -- =============================================
 INSERT IGNORE INTO Gift (`giftId`, `senderId`, `receiverId`, `giftReceiverType`, `fromAccountId`, `toSavingsAccountId`, `amount`, `cumulativeTotal`, `savingsProductName`, `interestRate`) VALUES
-(1, 1, 2, 'CHILD', 1, 4, 100000, 200000, '하나 하나님의 적금', 3.5),
+(1, 1, 2, 'GRANDCHILD', 1, 4, 100000, 200000, '하나 하나님의 적금', 3.5),
 (2, 2, NULL, 'GRANDCHILD', 2, 999, 50000, 50000, '꿈나무 축복 적금', 4.0),
-(3, 3, 2, 'CONGREGATION', 3, 4, 10000, 10000, '성도 사랑 적금', 2.5);
+(3, 3, 2, 'GRANDCHILD', 3, 4, 10000, 10000, '성도 사랑 적금', 2.5);
 
-INSERT IGNORE INTO PrayerSavings (`prayerSavingsId`, `gift`, `prayerContent`, `startDate`, `dDay`) VALUES
+INSERT IGNORE INTO PrayerSavings (`prayerSavingsId`, `giftId`, `prayerContent`, `startDate`, `dDay`) VALUES
 (1, 1, '매달 쌓이는 적금처럼 당신을 향한 축복도 쌓여가길 기도합니다.', '2026-04-01', 19),
 (2, 1, '지치고 힘들 때마다 이 적금이 작은 위로가 되길 바랍니다.', '2026-04-01', 19),
 (3, 1, '오늘도 주님의 은혜 안에서 평안한 하루 보내세요.', '2026-04-01', 19),

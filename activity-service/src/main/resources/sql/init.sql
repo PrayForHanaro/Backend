@@ -88,13 +88,16 @@ CREATE TABLE IF NOT EXISTS Calendar (
 
 -- =============================================
 -- SEED DATA (INSERT IGNORE 사용)
+-- Category: 봉사모집, 동행찾기, 교회행사
+-- Type: ONE_TIME, RECURRING
+-- State: RECRUITING, CLOSED
 -- =============================================
 INSERT IGNORE INTO Activity (`activityId`, `orgId`, `creatorId`, `activityCategory`, `activityType`, `activityState`, `title`, `description`, `location`, `maxMembers`, `startAt`, `endAt`, `recurrence`, `pointAmount`) VALUES
-(1, 1, 3, 'VOLUNTEER', 'REGULAR', 'RECRUITING', '독거노인 도시락 배달 봉사', '매주 토요일 어르신들께 도시락을 배달합니다.', '하나교회 1층 식당', 10, '2026-05-02 09:00:00', '2026-12-26 12:00:00', 'WEEKLY', 100),
-(2, 2, 3, 'FELLOWSHIP', 'REGULAR', 'RECRUITING', '주일 오후 배드민턴 소모임', '예배 후 즐겁게 운동해요!', '은혜교회 앞 체육관', 20, '2026-05-03 15:00:00', '2026-12-27 17:00:00', 'WEEKLY', 50),
-(3, 1, 3, 'CHURCH_EVENT', 'ONCE', 'RECRUITING', '여름 성경 학교 교사 모집', '여름 성경 학교를 함께 준비해요.', '하나교회 중강당', 15, '2026-07-20 09:00:00', '2026-07-22 18:00:00', NULL, 200),
-(4, 2, 3, 'VOLUNTEER', 'ONCE', 'CLOSED', '병원 안내 봉사', '인근 병원에서 환자분들을 돕습니다.', '하나성심병원', 5, '2026-04-10 10:00:00', '2026-04-10 14:00:00', NULL, 100),
-(5, 1, 3, 'FELLOWSHIP', 'REGULAR', 'RECRUITING', '목요 시니어 찬양대', '목소리로 주님을 찬양하는 시니어 모임입니다.', '하나교회 소강당', 30, '2026-05-07 10:00:00', '2026-12-24 12:00:00', 'WEEKLY', 50);
+(1, 1, 3, '봉사모집', 'RECURRING', 'RECRUITING', '독거노인 도시락 배달 봉사', '매주 토요일 어르신들께 도시락을 배달합니다.', '하나교회 1층 식당', 10, '2026-05-02 09:00:00', '2026-12-26 12:00:00', 'WEEKLY', 100),
+(2, 2, 3, '동행찾기', 'RECURRING', 'RECRUITING', '주일 오후 배드민턴 소모임', '예배 후 즐겁게 운동해요!', '은혜교회 앞 체육관', 20, '2026-05-03 15:00:00', '2026-12-27 17:00:00', 'WEEKLY', 50),
+(3, 1, 3, '교회행사', 'ONE_TIME', 'RECRUITING', '여름 성경 학교 교사 모집', '여름 성경 학교를 함께 준비해요.', '하나교회 중강당', 15, '2026-07-20 09:00:00', '2026-07-22 18:00:00', NULL, 200),
+(4, 2, 3, '봉사모집', 'ONE_TIME', 'CLOSED', '병원 안내 봉사', '인근 병원에서 환자분들을 돕습니다.', '하나성심병원', 5, '2026-04-10 10:00:00', '2026-04-10 14:00:00', NULL, 100),
+(5, 1, 3, '동행찾기', 'RECURRING', 'RECRUITING', '목요 시니어 찬양대', '목소리로 주님을 찬양하는 시니어 모임입니다.', '하나교회 소강당', 30, '2026-05-07 10:00:00', '2026-12-24 12:00:00', 'WEEKLY', 50);
 
 INSERT IGNORE INTO ActivityRecurrenceDay (`activityId`, `recurrenceDay`) VALUES
 (1, 'SATURDAY'), (2, 'SUNDAY'), (5, 'THURSDAY');
