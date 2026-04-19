@@ -140,8 +140,8 @@ jobs:
             cd ~/project
 
             echo "==== Exporting S3 Environment Variables ===="
-            export AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }}
-            export AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            export AWS_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY_ID }}
+            export AWS_SECRET_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}
             export AWS_REGION=ap-northeast-2
 
             echo "==== Deploy changed services only ===="
