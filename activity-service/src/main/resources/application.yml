@@ -20,8 +20,11 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
+    defer-datasource-initialization: true
     properties:
       hibernate:
         jdbc:
@@ -34,6 +37,7 @@ spring:
   sql:
     init:
       mode: never
+      schema-locations: classpath:sql/init.sql
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:

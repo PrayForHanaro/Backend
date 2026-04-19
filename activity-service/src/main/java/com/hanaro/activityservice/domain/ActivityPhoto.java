@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "ACTIVITY_PHOTO")
+@Table(name = "ActivityPhoto")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -18,12 +18,12 @@ public class ActivityPhoto extends BaseEntity{
 	private Long photoId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "activity_id", nullable = false)
-	private Activity activity;  // 같은 DB → FK 정상
+	@JoinColumn(name = "activityId", nullable = false)
+	private Activity activity;
 
-	@Column(nullable = false, length = 500)
+	@Column(name = "photoUrl", nullable = false, length = 500)
 	private String photoUrl;
 
-	@Column(nullable = false)
-	private int orderNum;       // 1~3
+	@Column(name = "orderNum", nullable = false)
+	private int orderNum;
 }
