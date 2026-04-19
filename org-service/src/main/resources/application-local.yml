@@ -4,3 +4,7 @@ spring:
     url: jdbc:mysql://org-db:3306/org_db
     username: root
     password: root
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:sql/init.sql

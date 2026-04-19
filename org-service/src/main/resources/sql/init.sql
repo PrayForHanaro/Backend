@@ -1,8 +1,6 @@
 -- =============================================
 -- 1. ReligiousOrg (종교단체)
 -- =============================================
-DROP TABLE IF EXISTS ReligiousOrg;
-
 CREATE TABLE IF NOT EXISTS ReligiousOrg (
     `religiousOrgId`      BIGINT         NOT NULL AUTO_INCREMENT,
     `orgType`              VARCHAR(10)    NOT NULL,
@@ -19,9 +17,9 @@ CREATE TABLE IF NOT EXISTS ReligiousOrg (
 );
 
 -- =============================================
--- SEED DATA
+-- SEED DATA (INSERT IGNORE 사용)
 -- =============================================
-INSERT INTO ReligiousOrg (`religiousOrgId`, `orgType`, `orgName`, `address`, `phone`, `representativeId`, `accountId`) VALUES
+INSERT IGNORE INTO ReligiousOrg (`religiousOrgId`, `orgType`, `orgName`, `address`, `phone`, `representativeId`, `accountId`) VALUES
 (1, 'CHURCH', '하나교회', '서울시 성동구 왕십리로 1', '02-1234-5678', 3, 100),
 (2, 'CHURCH', '은혜교회', '서울시 강남구 테헤란로 2', '02-2345-6789', NULL, 101),
 (3, 'CATHOLIC', '명동성당', '서울시 중구 명동길 74', '02-3456-7890', NULL, 102),

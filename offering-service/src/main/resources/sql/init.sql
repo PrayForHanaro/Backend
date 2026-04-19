@@ -1,11 +1,7 @@
-DROP TABLE IF EXISTS Pension;
-DROP TABLE IF EXISTS RecurringOffering;
-DROP TABLE IF EXISTS Offering;
-
 -- =============================================
 -- 1. Offering (헌금 내역)
 -- =============================================
-CREATE TABLE Offering (
+CREATE TABLE IF NOT EXISTS Offering (
     `offeringId`    BIGINT         NOT NULL AUTO_INCREMENT,
     `userId`        BIGINT         NOT NULL,
     `orgId`         BIGINT         NOT NULL,
@@ -23,7 +19,7 @@ CREATE TABLE Offering (
 -- =============================================
 -- 2. RecurringOffering
 -- =============================================
-CREATE TABLE RecurringOffering (
+CREATE TABLE IF NOT EXISTS RecurringOffering (
     `recurringId`      BIGINT         NOT NULL AUTO_INCREMENT,
     `userId`           BIGINT         NOT NULL,
     `accountId`        BIGINT         NOT NULL,
@@ -42,7 +38,7 @@ CREATE TABLE RecurringOffering (
 -- =============================================
 -- 3. Pension
 -- =============================================
-CREATE TABLE Pension (
+CREATE TABLE IF NOT EXISTS Pension (
     `pensionId`         BIGINT         NOT NULL AUTO_INCREMENT,
     `userId`            BIGINT         NOT NULL,
     `accountId`         BIGINT         NULL,
@@ -59,22 +55,21 @@ CREATE TABLE Pension (
 );
 
 -- =============================================
--- SEED DATA
+-- SEED DATA (INSERT IGNORE 사용)
 -- =============================================
--- 유저1의 헌금 릴레이
-INSERT INTO Offering (`userId`, `orgId`, `accountId`, `offeringType`, `amount`, `offererName`, `prayerContent`, `usedPoint`) VALUES
-(2, 2, 2, '십일조', 200000, '유저1', '4월의 첫 열매를 드립니다.', 0),
-(2, 2, 2, '감사헌금', 50000, '유저1', '항상 지켜주심에 감사드립니다.', 5000),
-(2, 2, 2, '감사헌금', 20000, '유저1', '작은 소망이 이루어져 감사합니다.', 0),
-(2, 2, 2, '십일조', 200000, '유저1', '3월의 십일조를 드립니다.', 0),
-(3, 1, 3, '선교헌금', 100000, '목사1', '땅끝까지 복음이 전해지길.', 0),
-(1, 1, 1, '감사헌금', 1000000, '관리자1', '모든 영광을 주님께.', 0);
+INSERT IGNORE INTO Offering (`offeringId`, `userId`, `orgId`, `accountId`, `offeringType`, `amount`, `offererName`, `prayerContent`, `usedPoint`) VALUES
+(1, 2, 2, 2, '십일조', 200000, '유저1', '4월의 첫 열매를 드립니다.', 0),
+(2, 2, 2, 2, '감사헌금', 50000, '유저1', '항상 지켜주심에 감사드립니다.', 5000),
+(3, 2, 2, 2, '감사헌금', 20000, '유저1', '작은 소망이 이루어져 감사합니다.', 0),
+(4, 2, 2, 2, '십일조', 200000, '유저1', '3월의 십일조를 드립니다.', 0),
+(5, 3, 1, 3, '선교헌금', 100000, '목사1', '땅끝까지 복음이 전해지길.', 0),
+(6, 1, 1, 1, '감사헌금', 1000000, '관리자1', '모든 영광을 주님께.', 0);
 
-INSERT INTO RecurringOffering (`userId`, `accountId`, `orgId`, `offeringType`, `amount`, `startDate`, `nextPaymentDate`) VALUES
-(2, 2, 2, '십일조', 200000, '2026-01-01', '2026-05-01'),
-(3, 3, 1, '선교헌금', 50000, '2026-02-01', '2026-05-01');
+INSERT IGNORE INTO RecurringOffering (`recurringId`, `userId`, `accountId`, `orgId`, `offeringType`, `amount`, `startDate`, `nextPaymentDate`) VALUES
+(1, 2, 2, 2, '십일조', 200000, '2026-01-01', '2026-05-01'),
+(2, 3, 3, 1, '선교헌금', 50000, '2026-02-01', '2026-05-01');
 
-INSERT INTO Pension (`userId`, `pensionType`, `isHanaBank`, `totalContribution`, `profit`, `returnRate`, `institutionName`) VALUES
-(2, 'PERSONAL', 1, 10000000, 1500000, 15.0, '하나은행'),
-(2, 'NATIONAL', 0, 5000000, 200000, 4.0, '국민연금공단'),
-(3, 'RETIREMENT', 1, 15000000, 2000000, 13.3, '하나은행');
+INSERT IGNORE INTO Pension (`pensionId`, `userId`, `pensionType`, `isHanaBank`, `totalContribution`, `profit`, `returnRate`, `institutionName`) VALUES
+(1, 2, 'PERSONAL', 1, 10000000, 1500000, 15.0, '하나은행'),
+(2, 2, 'NATIONAL', 0, 5000000, 200000, 4.0, '국민연금공단'),
+(3, 3, 'RETIREMENT', 1, 15000000, 2000000, 13.3, '하나은행');
