@@ -19,7 +19,6 @@ public class OfferingRequestDTO {
     String name;       // 기명일 때 이름
     BigDecimal amount;
     BigDecimal usedPoint;
-    int point;          // 추가: 사용한 포인트 (기록용)
     String prayerTopic;
 
 }

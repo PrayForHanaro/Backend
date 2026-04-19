@@ -1,4 +1,11 @@
+server:
+  port: 8080
+
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   profiles:
     active: local
   application:
@@ -6,8 +13,11 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
+    defer-datasource-initialization: true
     properties:
       hibernate:
         jdbc:
@@ -20,9 +30,10 @@ spring:
   sql:
     init:
       mode: never
+      schema-locations: classpath:sql/init.sql
 
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       properties:
         reconnect:
@@ -30,11 +41,9 @@ spring:
             ms: 1000
             max:
               ms: 10000
-  producer:
-    key-serializer: org.apache.kafka.common.serialization.StringSerializer
-    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
-
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 feign:
   circuitbreaker:
     enabled: true

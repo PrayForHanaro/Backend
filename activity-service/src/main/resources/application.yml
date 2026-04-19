@@ -1,13 +1,30 @@
+server:
+  port: 8080
+
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
+      file-size-threshold: 2KB
   profiles:
     active: local
   application:
     name: activity-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3311/activity_db}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
+    defer-datasource-initialization: true
     properties:
       hibernate:
         jdbc:
@@ -20,8 +37,9 @@ spring:
   sql:
     init:
       mode: never
+      schema-locations: classpath:sql/init.sql
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       properties:
         reconnect:
@@ -32,3 +50,16 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+springdoc:
+  packages-to-scan: com.hanaro.activityservice.controller
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    com.hanaro: DEBUG
+    org.springframework.web: DEBUG
+

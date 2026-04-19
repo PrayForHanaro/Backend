@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "RECURRING_OFFERING")
+@Table(name = "RecurringOffering")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -28,51 +28,32 @@ public class RecurringOffering extends BaseEntity{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long recurringId;
 
-	/** 정기헌금 등록한 성도 ID (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "userId", nullable = false)
 	private Long userId;
 
-	/** 자동이체 출금 계좌 ID (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "accountId", nullable = false)
 	private Long accountId;
 
-	/** 헌금 대상 교회/성당/절 ID (org_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "orgId", nullable = false)
 	private Long orgId;
 
-	/**
-	 * 헌금 종류
-	 * 십일조 / 감사헌금 / 선교헌금 / 건축헌금 / 기타
-	 */
-	@Column(nullable = false, length = 20)
+	@Column(name = "offeringType", nullable = false, length = 20)
 	@Enumerated(EnumType.STRING)
 	private OfferingType offeringType;
 
-	/** 매달 자동이체 금액 */
-	@Column(nullable = false)
+	@Column(name = "amount", nullable = false)
 	private BigDecimal amount;
 
-	/** 자동이체 시작일 */
-	@Column(nullable = false)
+	@Column(name = "startDate", nullable = false)
 	private LocalDate startDate;
 
-	/** 자동이체 종료일 (null = 무기한) */
+	@Column(name = "endDate")
 	private LocalDate endDate;
 
-	/**
-	 * 다음 납부 예정일
-	 * 배치 스케줄러가 이 날짜 기준으로 자동이체 실행
-	 * 이체 완료 후 다음달로 업데이트
-	 */
-	@Column(nullable = false)
+	@Column(name = "nextPaymentDate", nullable = false)
 	private LocalDate nextPaymentDate;
 
-	/**
-	 * 활성화 여부
-	 * true = 자동이체 진행 중
-	 * false = 중지
-	 */
-	@Column(nullable = false)
+	@Column(name = "isActive", nullable = false)
 	private boolean isActive;
 
 	@PrePersist

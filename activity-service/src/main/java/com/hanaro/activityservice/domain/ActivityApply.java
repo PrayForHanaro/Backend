@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-	name = "ACTIVITY_APPLY",
+	name = "ActivityApply",
 	uniqueConstraints = @UniqueConstraint(
-		columnNames = {"activity_id", "user_id"}
+		columnNames = {"activityId", "userId"}
 	)
 )
 @Getter
@@ -23,13 +23,13 @@ public class ActivityApply extends BaseEntity{
 	private Long applyId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "activity_id", nullable = false)
-	private Activity activity;  // 같은 DB → FK 정상
+	@JoinColumn(name = "activityId", nullable = false)
+	private Activity activity;
 
-	@Column(nullable = false)
-	private Long userId;        // FK 없음 (user_db)
+	@Column(name = "userId", nullable = false)
+	private Long userId;
 
-	@Column(nullable = false)
+	@Column(name = "pointEarned", nullable = false)
 	private int pointEarned;
 
 }
