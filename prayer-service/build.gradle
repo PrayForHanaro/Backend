@@ -24,12 +24,7 @@ ext {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    // TEMP: PR #11 후 common에서 security web/config 빠짐. PreAuthenticatedUserFilter 가
-    // SecurityFilterChain·UsernamePasswordAuthenticationFilter 등 web 타입 사용. 게이트웨이
-    // 정식 채택 후 SecurityConfig·필터 정리 시 함께 제거 (Plan §6 Task 9).
-    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'com.mysql:mysql-connector-j'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
