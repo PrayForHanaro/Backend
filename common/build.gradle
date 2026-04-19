@@ -13,7 +13,11 @@ java {
 }
 
 dependencies {
+    api 'org.springframework:spring-web'
     api 'org.springframework.security:spring-security-core'
+    api 'org.springframework.security:spring-security-web'
+    api 'io.github.openfeign:feign-core:13.5'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api'
 
     // MapStruct 추가
     api 'org.mapstruct:mapstruct:1.6.3'
@@ -22,4 +26,5 @@ dependencies {
      annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
 }

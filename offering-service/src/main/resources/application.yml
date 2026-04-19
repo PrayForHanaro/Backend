@@ -47,3 +47,9 @@ spring:
 feign:
   circuitbreaker:
     enabled: true
+
+security:
+  internal:
+    hmac-secret: ${INTERNAL_HMAC_SECRET}
+    api-key: ${INTERNAL_API_KEY:offering-service-key}
+    valid-api-keys: ${INTERNAL_VALID_API_KEYS:user-service-key,activity-service-key,offering-service-key,prayer-service-key,org-service-key}

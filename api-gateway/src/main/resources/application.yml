@@ -93,6 +93,8 @@ jwt:
   cookie-name: ${JWT_COOKIE_NAME}
 
 security:
+  internal:
+    hmac-secret: ${INTERNAL_HMAC_SECRET}
   auth:
     permit-paths:
       - /health
@@ -102,15 +104,18 @@ security:
       - /error
     admin-paths:
       - /api/admin/**
-
-  internal-headers:
-    user-id: X-User-Id
-    user-role: X-User-Role
-    user-name: X-User-Name
-    org-id: X-Org-Id
-
-  remove-external-headers:
-    - X-User-Id
-    - X-User-Role
-    - X-User-Name
-    - X-Org-Id
+    internal-headers:
+      user-id: X-Auth-User-Id
+      user-role: X-Auth-User-Role
+      user-name: X-Auth-User-Name
+      org-id: X-Auth-Org-Id
+    remove-external-headers:
+      - X-Auth-User-Id
+      - X-Auth-User-Role
+      - X-Auth-User-Name
+      - X-Auth-Org-Id
+      - X-From-Gateway
+      - X-Internal-Timestamp
+      - X-Internal-Signature
+      - X-Internal-Api-Key
+      - X-Caller-Service
