@@ -92,6 +92,22 @@ CREATE TABLE IF NOT EXISTS ONCE_TRANSFER (
 );
 
 -- =============================================
+-- 6. RegisteredAccount (일회성 송금 수신 계좌 즐겨찾기)
+-- =============================================
+CREATE TABLE IF NOT EXISTS REGISTERED_ACCOUNT (
+    `registeredAccountId` BIGINT       NOT NULL AUTO_INCREMENT,
+    `sender_id`           BIGINT       NOT NULL,
+    `accountNumber`       VARCHAR(50)  NOT NULL,
+    `alias`               VARCHAR(50)  NULL,
+    `lastUsedAt`          DATETIME(6)  NOT NULL,
+    `createdAt`           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt`           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`registeredAccountId`),
+    UNIQUE KEY uq_registered_account_sender_account (`sender_id`, `accountNumber`),
+    INDEX idx_registered_account_sender_last_used (`sender_id`, `lastUsedAt` DESC)
+);
+
+-- =============================================
 -- SEED DATA (INSERT IGNORE 사용)
 -- =============================================
 INSERT IGNORE INTO SAVINGS_PRODUCT (`savingsProductId`, `name`, `interestRate`, `isActive`) VALUES
@@ -124,3 +140,8 @@ INSERT IGNORE INTO GIFT_TRANSFER (`transferId`, `gift_id`, `transferDate`, `amou
 INSERT IGNORE INTO ONCE_TRANSFER (`onceTransferId`, `sender_id`, `fromAccountId`, `toAccountNumber`, `amount`, `message`, `sentAt`, `status`, `completedAt`) VALUES
 (1, 1, 1, '111-222-333333', 50000, '응원해, 항상 건강하길 기도해.', '2026-04-18 10:30:00.000000', 'SUCCESS', '2026-04-18 10:30:00.500000'),
 (2, 2, 2, '444-555-666666', 30000, NULL,                              '2026-04-19 09:15:00.000000', 'SUCCESS', '2026-04-19 09:15:00.500000');
+
+-- RegisteredAccount: ONCE_TRANSFER 성공 이력을 미러링해 시드 사용자 로그인 즉시 드롭다운 노출
+INSERT IGNORE INTO REGISTERED_ACCOUNT (`registeredAccountId`, `sender_id`, `accountNumber`, `alias`, `lastUsedAt`) VALUES
+(1, 1, '111-222-333333', NULL, '2026-04-18 10:30:00.500000'),
+(2, 2, '444-555-666666', NULL, '2026-04-19 09:15:00.500000');
