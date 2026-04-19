@@ -36,36 +36,31 @@ public class GatewayRouteConfig {
             GatewayUserHeaderFilter gatewayUserHeaderFilter
     ) {
         return GatewayRouterFunctions.route("offering-service")
-                .route(path("/apis/offerings/**"), http())
-                .before(stripPrefix(1))
+                .route(path("/apis/offering/**"), http())
                 .before(gatewayUserHeaderFilter.addInternalUserHeaders())
                 .before(uri(offeringServiceUri))
                 .build()
 
                 .and(GatewayRouterFunctions.route("activity-service")
-                        .route(path("/apis/activities/**"), http())
-                        .before(stripPrefix(1))
+                        .route(path("/apis/activity/**"), http())
                         .before(gatewayUserHeaderFilter.addInternalUserHeaders())
                         .before(uri(activityServiceUri))
                         .build())
 
                 .and(GatewayRouterFunctions.route("prayer-service")
-                        .route(path("/apis/prayers/**"), http())
-                        .before(stripPrefix(1))
+                        .route(path("/apis/prayer/**"), http())
                         .before(gatewayUserHeaderFilter.addInternalUserHeaders())
                         .before(uri(prayerServiceUri))
                         .build())
 
                 .and(GatewayRouterFunctions.route("user-service")
-                        .route(path("/apis/users/**"), http())
-                        .before(stripPrefix(1))
+                        .route(path("/apis/user/**"), http())
                         .before(gatewayUserHeaderFilter.addInternalUserHeaders())
                         .before(uri(userServiceUri))
                         .build())
 
                 .and(GatewayRouterFunctions.route("org-service")
-                        .route(path("/apis/orgs/**"), http())
-                        .before(stripPrefix(1))
+                        .route(path("/apis/org/**"), http())
                         .before(gatewayUserHeaderFilter.addInternalUserHeaders())
                         .before(uri(orgServiceUri))
                         .build());

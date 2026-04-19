@@ -33,18 +33,18 @@ public class GatewayHeaderBuilder {
                 userName.getBytes(StandardCharsets.UTF_8)
         );
 
-        headers.set("X-User-Id", userId);
-        headers.set("X-User-Name", encodedName != null ? encodedName : "");
-        headers.set("X-Org-Id", orgId != null ? orgId : "");
-        headers.set("X-User-Role", String.join(",", roles != null ? roles : Collections.emptyList()));
+        headers.set("X-Auth-User-Id", userId);
+        headers.set("X-Auth-User-Name", encodedName != null ? encodedName : "");
+        headers.set("X-Auth-Org-Id", orgId != null ? orgId : "");
+        headers.set("X-Auth-User-Role", String.join(",", roles != null ? roles : Collections.emptyList()));
 
         return headers;
     }
 
     public void removeSpoofableHeaders(HttpHeaders headers) {
-        headers.remove("X-User-Id");
-        headers.remove("X-User-Name");
-        headers.remove("X-User-Role");
-        headers.remove("X-Org-Id");
+        headers.remove("X-Auth-User-Id");
+        headers.remove("X-Auth-User-Name");
+        headers.remove("X-Auth-User-Role");
+        headers.remove("X-Auth-Org-Id");
     }
 }

@@ -40,4 +40,5 @@ out/
 **/secret.yml
 **/security.yml
 
+### env ###
 .env

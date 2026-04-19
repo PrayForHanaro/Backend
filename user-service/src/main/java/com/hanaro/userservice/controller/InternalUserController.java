@@ -1,11 +1,10 @@
 package com.hanaro.userservice.controller;
 
-import com.hanaro.common.security.CustomUserDetails;
 import com.hanaro.userservice.dto.request.UsePointRequest;
 import com.hanaro.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,13 +17,12 @@ public class InternalUserController {
 
   private final UserService userService;
 
-  @PostMapping("/points/use")
+  @PostMapping("/{userId}/points/use")
   public ResponseEntity<Void> usePoint(
-      @AuthenticationPrincipal CustomUserDetails user,
+      @PathVariable Long userId,
       @RequestBody UsePointRequest request
   ) {
-    userService.usePoint(user.getUserId(), request);
-    System.out.println("deploy test v2");
+    userService.usePoint(userId, request);
     return ResponseEntity.ok().build();
   }
 

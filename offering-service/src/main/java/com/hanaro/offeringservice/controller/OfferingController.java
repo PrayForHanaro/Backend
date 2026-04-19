@@ -5,9 +5,9 @@ import com.hanaro.common.security.CustomUserDetails;
 import com.hanaro.offeringservice.dto.OfferingRequestDTO;
 import com.hanaro.offeringservice.service.OfferingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class OfferingController {
     private final OfferingService offeringService;
 
-    @PostMapping
+    @PostMapping("/once")
     public ApiResponse<Long> registerOffering(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestHeader("X-Auth-User-Id") Long userId,
             @RequestBody OfferingRequestDTO request) {
-        return ApiResponse.ok(offeringService.registerOffering(userDetails.getUserId(), request));
+        return ApiResponse.ok(offeringService.registerOffering(userId, request));
     }
 }

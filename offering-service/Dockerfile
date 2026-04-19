@@ -5,7 +5,6 @@ FROM eclipse-temurin:21-alpine
 WORKDIR /app
 
 # 3. Gradle로 빌드된 .jar 파일을 컨테이너 내부로 복사하시오
-
 COPY build/libs/*SNAPSHOT.jar app.jar
 
 # 4. 컨테이너가 시작될 때 실행할 명령을 적으시오
