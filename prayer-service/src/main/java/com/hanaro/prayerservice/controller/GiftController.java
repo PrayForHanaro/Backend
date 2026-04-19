@@ -3,24 +3,36 @@ package com.hanaro.prayerservice.controller;
 import com.hanaro.common.response.ApiResponse;
 import com.hanaro.common.security.CustomUserDetails;
 import com.hanaro.prayerservice.dto.GiftReceiverResponse;
+import com.hanaro.prayerservice.dto.SavingsJoinRequest;
+import com.hanaro.prayerservice.dto.SavingsJoinResponse;
 import com.hanaro.prayerservice.service.GiftService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/gifts")
+@RequestMapping("/apis/prayer/prayers")
 @RequiredArgsConstructor
 public class GiftController {
 
     private final GiftService giftService;
 
-    @GetMapping("/myReceivers")
+    @GetMapping("/me")
     public ApiResponse<List<GiftReceiverResponse>> getMyReceivers(@AuthenticationPrincipal CustomUserDetails user) {
         return ApiResponse.ok(giftService.getMyReceivers(user.getUserId()));
+    }
+
+    @PostMapping
+    public ApiResponse<SavingsJoinResponse> join(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @RequestBody SavingsJoinRequest request) {
+        return ApiResponse.ok(giftService.join(user.getUserId(), request));
     }
 }
