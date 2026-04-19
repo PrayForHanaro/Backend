@@ -30,37 +30,27 @@ spring:
           - id: org-service
             uri: http://org-service:8080
             predicates:
-              - Path=/org/**
-            filters:
-              - StripPrefix=1
+              - Path=/apis/org/**
 
           - id: offering-service
             uri: http://offering-service:8080
             predicates:
-              - Path=/offering/**
-            filters:
-              - StripPrefix=1
+              - Path=/apis/offering/**
 
           - id: activity-service
             uri: http://activity-service:8080
             predicates:
-              - Path=/activity/**
-            filters:
-              - StripPrefix=1
+              - Path=/apis/activity/**
 
           - id: prayer-service
             uri: http://prayer-service:8080
             predicates:
-              - Path=/prayer/**
-            filters:
-              - StripPrefix=1
-              -
+              - Path=/apis/prayer/**
+
           - id: user-service
             uri: http://user-service:8080
             predicates:
-              - Path=/user/**
-            filters:
-              - StripPrefix=1
+              - Path=/apis/user/**
 
 springdoc:
   swagger-ui:
