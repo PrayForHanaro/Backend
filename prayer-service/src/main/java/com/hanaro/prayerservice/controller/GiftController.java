@@ -5,6 +5,7 @@ import com.hanaro.prayerservice.dto.GiftReceiverResponse;
 import com.hanaro.prayerservice.dto.SavingsJoinRequest;
 import com.hanaro.prayerservice.dto.SavingsJoinResponse;
 import com.hanaro.prayerservice.service.GiftService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ public class GiftController {
     @PostMapping
     public ApiResponse<SavingsJoinResponse> join(
             @RequestHeader("X-Auth-User-Id") Long userId,
-            @RequestBody SavingsJoinRequest request) {
+            @Valid @RequestBody SavingsJoinRequest request) {
         return ApiResponse.ok(giftService.join(userId, request));
     }
 }

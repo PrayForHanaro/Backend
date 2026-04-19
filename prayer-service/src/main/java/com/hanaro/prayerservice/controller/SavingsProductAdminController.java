@@ -6,6 +6,7 @@ import com.hanaro.prayerservice.dto.SavingsProductResponse;
 import com.hanaro.prayerservice.exception.PrayerErrorCode;
 import com.hanaro.prayerservice.exception.PrayerException;
 import com.hanaro.prayerservice.service.SavingsProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class SavingsProductAdminController {
     @PostMapping
     public ApiResponse<SavingsProductResponse> create(
             @RequestHeader("X-Auth-User-Role") String role,
-            @RequestBody SavingsProductCreateRequest request) {
+            @Valid @RequestBody SavingsProductCreateRequest request) {
         requireAdmin(role);
         return ApiResponse.ok(service.create(request));
     }

@@ -7,6 +7,7 @@ import com.hanaro.prayerservice.dto.PrayerMessageListResponse;
 import com.hanaro.prayerservice.dto.PrayerMessageResponse;
 import com.hanaro.prayerservice.dto.PrayerMessageUpdateRequest;
 import com.hanaro.prayerservice.service.PrayerSavingsService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class PrayerSavingsController {
     public ApiResponse<PrayerMessageResponse> create(
             @RequestHeader("X-Auth-User-Id") Long userId,
             @PathVariable Long giftId,
-            @RequestBody PrayerMessageCreateRequest request) {
+            @Valid @RequestBody PrayerMessageCreateRequest request) {
         return ApiResponse.ok(prayerSavingsService.create(userId, giftId, request));
     }
 
@@ -47,7 +48,7 @@ public class PrayerSavingsController {
     public ApiResponse<PrayerMessageResponse> update(
             @RequestHeader("X-Auth-User-Id") Long userId,
             @PathVariable Long messageId,
-            @RequestBody PrayerMessageUpdateRequest request) {
+            @Valid @RequestBody PrayerMessageUpdateRequest request) {
         return ApiResponse.ok(prayerSavingsService.update(userId, messageId, request));
     }
 
