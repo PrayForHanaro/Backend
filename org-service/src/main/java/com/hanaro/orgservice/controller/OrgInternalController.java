@@ -14,6 +14,6 @@ public class OrgInternalController {
 
     @GetMapping("/{orgId}/summary")
     public ApiResponse getOrgSummaryInternal(@PathVariable Long orgId) {
-        return ApiResponse.ok(orgService.getOrgSummary(orgId));
+        return ApiResponse.ok(orgService.getSummary(orgId));
     }
 }
