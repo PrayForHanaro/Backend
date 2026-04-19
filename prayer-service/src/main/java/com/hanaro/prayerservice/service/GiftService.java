@@ -20,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -27,6 +30,7 @@ import java.util.List;
 public class GiftService {
 
     private static final long SAVINGS_JOIN_POINT = 500L;
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     private final GiftRepository giftRepository;
     private final SavingsProductRepository savingsProductRepository;
@@ -34,8 +38,15 @@ public class GiftService {
     private final PointEarnPublisher pointEarnPublisher;
 
     public List<GiftReceiverResponse> getMyReceivers(Long userId) {
+        LocalDate today = LocalDate.now(KST);
         return giftRepository.findAllBySenderIdAndIsActiveTrue(userId).stream()
-                .map(g -> new GiftReceiverResponse(g.getReceiverId(), g.getGiftReceiverType().name()))
+                .map(g -> new GiftReceiverResponse(
+                        g.getReceiverId(),
+                        g.getGiftReceiverType().name(),
+                        g.getAmount(),
+                        g.getCumulativeTotal(),
+                        (int) ChronoUnit.DAYS.between(
+                                g.getCreatedAt().atZone(KST).toLocalDate(), today) + 1))
                 .toList();
     }
 
