@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
-
 import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.stripPrefix;
 import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.uri;
 import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions.http;
@@ -36,33 +35,63 @@ public class GatewayRouteConfig {
             GatewayUserHeaderFilter gatewayUserHeaderFilter
     ) {
         return GatewayRouterFunctions.route("offering-service")
-                .route(path("/apis/offering/**"), http())
-                .before(gatewayUserHeaderFilter.addInternalUserHeaders())
-                .before(uri(offeringServiceUri))
-                .build()
+                    .route(path("/apis/offering/**"), http())
+                    .before(gatewayUserHeaderFilter.addInternalUserHeaders())
+                    .before(uri(offeringServiceUri))
+                    .build()
+
+                .and(GatewayRouterFunctions.route("offering-service-docs")
+                    .route(path("/offering/v3/api-docs"), http())
+                    .before(stripPrefix(1))
+                    .before(uri(offeringServiceUri))
+                    .build())
 
                 .and(GatewayRouterFunctions.route("activity-service")
-                        .route(path("/apis/activity/**"), http())
-                        .before(gatewayUserHeaderFilter.addInternalUserHeaders())
-                        .before(uri(activityServiceUri))
-                        .build())
+                    .route(path("/apis/activity/**"), http())
+                    .before(gatewayUserHeaderFilter.addInternalUserHeaders())
+                    .before(uri(activityServiceUri))
+                    .build())
+
+                .and(GatewayRouterFunctions.route("activity-service-docs")
+                    .route(path("/activity/v3/api-docs"), http())
+                    .before(stripPrefix(1))
+                    .before(uri(activityServiceUri))
+                    .build())
 
                 .and(GatewayRouterFunctions.route("prayer-service")
-                        .route(path("/apis/prayer/**"), http())
-                        .before(gatewayUserHeaderFilter.addInternalUserHeaders())
-                        .before(uri(prayerServiceUri))
-                        .build())
+                    .route(path("/apis/prayer/**"), http())
+                    .before(gatewayUserHeaderFilter.addInternalUserHeaders())
+                    .before(uri(prayerServiceUri))
+                    .build())
+
+                .and(GatewayRouterFunctions.route("prayer-service-docs")
+                    .route(path("/prayer/v3/api-docs"), http())
+                    .before(stripPrefix(1))
+                    .before(uri(prayerServiceUri))
+                    .build())
 
                 .and(GatewayRouterFunctions.route("user-service")
-                        .route(path("/apis/user/**"), http())
-                        .before(gatewayUserHeaderFilter.addInternalUserHeaders())
-                        .before(uri(userServiceUri))
-                        .build())
+                    .route(path("/apis/user/**"), http())
+                    .before(gatewayUserHeaderFilter.addInternalUserHeaders())
+                    .before(uri(userServiceUri))
+                    .build())
+
+                .and(GatewayRouterFunctions.route("user-service-docs")
+                    .route(path("/user/v3/api-docs"), http())
+                    .before(stripPrefix(1))
+                    .before(uri(userServiceUri))
+                    .build())
 
                 .and(GatewayRouterFunctions.route("org-service")
-                        .route(path("/apis/org/**"), http())
-                        .before(gatewayUserHeaderFilter.addInternalUserHeaders())
-                        .before(uri(orgServiceUri))
-                        .build());
+                    .route(path("/apis/org/**"), http())
+                    .before(gatewayUserHeaderFilter.addInternalUserHeaders())
+                    .before(uri(orgServiceUri))
+                    .build())
+
+                .and(GatewayRouterFunctions.route("org-service-docs")
+                    .route(path("/org/v3/api-docs"), http())
+                    .before(stripPrefix(1))
+                    .before(uri(orgServiceUri))
+                    .build());
     }
 }

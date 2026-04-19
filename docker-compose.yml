@@ -247,6 +247,7 @@ services:
     ports:
       - "8086:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JWT_SECRET: ${JWT_SECRET}
       JWT_ISSUER: ${JWT_ISSUER}
@@ -259,6 +260,7 @@ services:
       - hana-network
 
 volumes:
+
   org-db-data:
   user-db-data:
   offering-db-data:

@@ -57,24 +57,24 @@ public class UserController {
 	//이미지 수정 - 수정한 url 저장
 	@PostMapping("/profile-image")
 	public ApiResponse<String> uploadProfileImage(
-			@RequestHeader("X-Auth-User-Id") Long userId,
+			@AuthenticationPrincipal CustomUserDetails user,
 			@RequestPart("file") MultipartFile file
 	) {
 		String url = storageService.upload(file, "profile");
-		userService.updateProfileImage(userId, url);
+		userService.updateProfileImage(user.getUserId(), url);
 		return ApiResponse.ok("프로필 이미지 수정이 완료되었습니다.", url);
 	}
 
   //사용가능 포인트 조회
   @GetMapping("/point")
-  public ApiResponse<Integer> getAvailablePoint(@RequestHeader("X-Auth-User-Id") Long userId) {
-		return ApiResponse.ok(userService.getPointSum(userId));  }
+  public ApiResponse<Integer> getAvailablePoint(@AuthenticationPrincipal CustomUserDetails user) {
+		return ApiResponse.ok(userService.getPointSum(user.getUserId()));  }
 
 	@GetMapping("/me")
 	public ApiResponse<UserMyPageResponseDTO> getMyPage(
-			@RequestHeader("X-Auth-User-Id") Long userId
+			@AuthenticationPrincipal CustomUserDetails user
 	) {
-		return ApiResponse.ok(userService.getMyPageInfo(userId));
+		return ApiResponse.ok(userService.getMyPageInfo(user.getUserId()));
 	}
 
 }
