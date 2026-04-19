@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 // 보내는 쪽의 정보를 쓴다. client 는 받는쪽에 만든다.
 @FeignClient(
     name = "user-service",
+    contextId = "accountClient",
     url = "http://user-service:8080"
 )
 public interface AccountClient {

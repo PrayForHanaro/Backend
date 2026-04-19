@@ -2,7 +2,6 @@ package com.hanaro.offeringservice.service;
 
 import com.hanaro.offeringservice.client.user.AccountClient;
 import com.hanaro.offeringservice.client.user.UserClient;
-import com.hanaro.offeringservice.domain.Offering;
 import com.hanaro.offeringservice.domain.OfferingType;
 import com.hanaro.offeringservice.dto.AccountWithdrawRequest;
 import com.hanaro.offeringservice.dto.OfferingRequestDTO;
@@ -16,9 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 @Slf4j
 @Service

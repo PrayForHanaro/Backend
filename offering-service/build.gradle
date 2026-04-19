@@ -36,9 +36,6 @@ dependencies {
 
     implementation project(':common')
 
-    // feign 추가
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:5.0.1'
-
     // Lombok 추가
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
