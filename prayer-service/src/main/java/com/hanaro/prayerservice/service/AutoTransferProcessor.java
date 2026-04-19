@@ -56,7 +56,7 @@ public class AutoTransferProcessor {
             reason = truncate(e.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
-        giftTransferRepository.save(GiftTransfer.builder()
+        GiftTransfer savedTransfer = giftTransferRepository.save(GiftTransfer.builder()
                 .gift(gift)
                 .transferDate(date)
                 .amount(amount)
@@ -73,7 +73,7 @@ public class AutoTransferProcessor {
                     .userId(gift.getSenderId())
                     .pointType(PointType.SAVINGS_RECURRING)
                     .amount(earnedPoint)
-                    .refId(gift.getGiftId())
+                    .refId(savedTransfer.getTransferId())
                     .info("기도적금 자동이체: " + gift.getSavingsProductName())
                     .timestamp(Instant.now())
                     .build());
