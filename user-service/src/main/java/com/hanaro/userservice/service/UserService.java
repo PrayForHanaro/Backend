@@ -7,6 +7,7 @@ import com.hanaro.userservice.dto.request.UsePointRequest;
 import com.hanaro.userservice.client.OrgClient;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
 import com.hanaro.userservice.dto.response.*;
+import com.hanaro.userservice.exception.LoginFailException;
 import com.hanaro.userservice.exception.UserNotFoundException;
 import com.hanaro.userservice.mapper.UserMapper;
 import com.hanaro.userservice.repository.PointRepository;
@@ -103,10 +104,10 @@ public class UserService {
 
     public LoginResponseDTO verify(LoginRequestDTO request) {
         User user = userRepository.findByPhone(request.phone())
-                .orElseThrow(() -> new IllegalArgumentException("전화번호 및 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new LoginFailException());
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new IllegalArgumentException("전화번호 및 비밀번호가 일치하지 않습니다.");
+            throw new LoginFailException();
         }
 
         return new LoginResponseDTO(
