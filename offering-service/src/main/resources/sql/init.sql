@@ -1,60 +1,77 @@
 -- =============================================
--- 1. OFFERING (헌금 내역)
--- 일회성 & 정기 헌금 모두 기록
--- user_id, org_id, account_id → 다른 DB 참조, FK 없음
+-- 1. Offering (헌금 내역)
 -- =============================================
-CREATE TABLE IF NOT EXISTS OFFERING (
-    offering_id    BIGINT        NOT NULL AUTO_INCREMENT,
-    user_id        BIGINT        NOT NULL COMMENT 'user_db 참조 FK없음',
-    org_id         BIGINT        NOT NULL COMMENT 'org_db 참조 FK없음',
-    account_id     BIGINT        NOT NULL COMMENT '출금 계좌 ID, user_db 참조 FK없음',
-    offering_type  VARCHAR(20)   NOT NULL COMMENT '십일조/감사헌금/선교헌금/건축헌금/기타',
-    amount         DECIMAL(15,2) NOT NULL,
-    offerer_name   VARCHAR(50)   NULL     COMMENT '무기명이면 NULL',
-    prayer_content VARCHAR(250)  NULL     COMMENT '기도제목 최대 250자',
-    created_at     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (offering_id)
-    );
+CREATE TABLE IF NOT EXISTS Offering (
+    `offeringId`    BIGINT         NOT NULL AUTO_INCREMENT,
+    `userId`        BIGINT         NOT NULL,
+    `orgId`         BIGINT         NOT NULL,
+    `accountId`     BIGINT         NOT NULL,
+    `offeringType`  VARCHAR(20)    NOT NULL,
+    `amount`         DECIMAL(15, 2) NOT NULL,
+    `offererName`   VARCHAR(50)    NULL,
+    `prayerContent` VARCHAR(250)   NULL,
+    `usedPoint`     DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    `createdAt`     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt`     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`offeringId`)
+);
 
 -- =============================================
--- 2. RECURRING_OFFERING (정기 헌금 자동이체 설정)
--- 배치 스케줄러가 next_payment_date 기준으로 자동이체 실행
--- user_id, account_id, org_id → 다른 DB 참조, FK 없음
+-- 2. RecurringOffering
 -- =============================================
-CREATE TABLE IF NOT EXISTS RECURRING_OFFERING (
-    recurring_id      BIGINT        NOT NULL AUTO_INCREMENT,
-    user_id           BIGINT        NOT NULL COMMENT 'user_db 참조 FK없음',
-    account_id        BIGINT        NOT NULL COMMENT '출금 계좌 ID, user_db 참조 FK없음',
-    org_id            BIGINT        NOT NULL COMMENT 'org_db 참조 FK없음',
-    offering_type     VARCHAR(20)   NOT NULL COMMENT '십일조/감사헌금/선교헌금/건축헌금/기타',
-    amount            DECIMAL(15,2) NOT NULL,
-    start_date        DATE          NOT NULL COMMENT '자동이체 시작일',
-    end_date          DATE          NULL     COMMENT '자동이체 종료일, NULL이면 무기한',
-    next_payment_date DATE          NOT NULL COMMENT '다음 납부 예정일, 이체 완료 후 다음달로 갱신',
-    is_active         TINYINT(1)    NOT NULL DEFAULT 1 COMMENT '1=진행중, 0=중지',
-    created_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (recurring_id)
-    );
+CREATE TABLE IF NOT EXISTS RecurringOffering (
+    `recurringId`      BIGINT         NOT NULL AUTO_INCREMENT,
+    `userId`           BIGINT         NOT NULL,
+    `accountId`        BIGINT         NOT NULL,
+    `orgId`            BIGINT         NOT NULL,
+    `offeringType`     VARCHAR(20)    NOT NULL,
+    `amount`            DECIMAL(15, 2) NOT NULL,
+    `startDate`        DATE           NOT NULL,
+    `endDate`          DATE           NULL,
+    `nextPaymentDate` DATE           NOT NULL,
+    `isActive`         TINYINT(1)     NOT NULL DEFAULT 1,
+    `createdAt`        DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt`        DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`recurringId`)
+);
 
 -- =============================================
--- 3. PENSION (유저가 가입한 연금)
--- 하나은행 연금 등록 시 user.donation_rate 증가 (1개=1%)
--- user_id, account_id → 다른 DB 참조, FK 없음
+-- 3. Pension
 -- =============================================
-CREATE TABLE IF NOT EXISTS PENSION (
-    pension_id         BIGINT        NOT NULL AUTO_INCREMENT,
-    user_id            BIGINT        NOT NULL COMMENT 'user_db 참조 FK없음',
-    account_id         BIGINT        NULL     COMMENT '연금 수령 계좌 ID, user_db 참조 FK없음',
-    pension_type       VARCHAR(20)   NOT NULL COMMENT '국민연금/퇴직연금/개인연금',
-    is_hana_bank       TINYINT(1)    NOT NULL DEFAULT 0 COMMENT '1=하나은행, 0=타행',
-    total_contribution DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT '총 납입액',
-    total_withdrawal   DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT '총 출금액',
-    profit             DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT '운용 수익',
-    return_rate        DECIMAL(5,2)  NOT NULL DEFAULT 0 COMMENT '수익률(%)',
-    institution_name   VARCHAR(100)  NULL     COMMENT '연금 기관명 예:하나은행/국민연금공단',
-    created_at         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (pension_id)
-    );
+CREATE TABLE IF NOT EXISTS Pension (
+    `pensionId`         BIGINT         NOT NULL AUTO_INCREMENT,
+    `userId`            BIGINT         NOT NULL,
+    `accountId`         BIGINT         NULL,
+    `pensionType`       VARCHAR(20)    NOT NULL,
+    `isHanaBank`       TINYINT(1)     NOT NULL DEFAULT 0,
+    `totalContribution` DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    `totalWithdrawal`   DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    `profit`             DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    `returnRate`        DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    `institutionName`   VARCHAR(100)   NULL,
+    `createdAt`         DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt`         DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`pensionId`)
+);
+
+-- =============================================
+-- SEED DATA (INSERT IGNORE 사용)
+-- OfferingType: 십일조, 감사헌금, 선교헌금, 건축헌금, 기타
+-- PensionType: 국민연금, 퇴직연금, 개인연금
+-- =============================================
+INSERT IGNORE INTO Offering (`offeringId`, `userId`, `orgId`, `accountId`, `offeringType`, `amount`, `offererName`, `prayerContent`, `usedPoint`) VALUES
+(1, 2, 2, 2, '십일조', 200000, '유저1', '4월의 첫 열매를 드립니다.', 0),
+(2, 2, 2, 2, '감사헌금', 50000, '유저1', '항상 지켜주심에 감사드립니다.', 5000),
+(3, 2, 2, 2, '감사헌금', 20000, '유저1', '작은 소망이 이루어져 감사합니다.', 0),
+(4, 2, 2, 2, '십일조', 200000, '유저1', '3월의 십일조를 드립니다.', 0),
+(5, 3, 1, 3, '선교헌금', 100000, '목사1', '땅끝까지 복음이 전해지길.', 0),
+(6, 1, 1, 1, '감사헌금', 1000000, '관리자1', '모든 영광을 주님께.', 0);
+
+INSERT IGNORE INTO RecurringOffering (`recurringId`, `userId`, `accountId`, `orgId`, `offeringType`, `amount`, `startDate`, `nextPaymentDate`) VALUES
+(1, 2, 2, 2, '십일조', 200000, '2026-01-01', '2026-05-01'),
+(2, 3, 3, 1, '선교헌금', 50000, '2026-02-01', '2026-05-01');
+
+INSERT IGNORE INTO Pension (`pensionId`, `userId`, `pensionType`, `isHanaBank`, `totalContribution`, `profit`, `returnRate`, `institutionName`) VALUES
+(1, 2, '개인연금', 1, 10000000, 1500000, 15.0, '하나은행'),
+(2, 2, '국민연금', 0, 5000000, 200000, 4.0, '국민연금공단'),
+(3, 3, '퇴직연금', 1, 15000000, 2000000, 13.3, '하나은행');

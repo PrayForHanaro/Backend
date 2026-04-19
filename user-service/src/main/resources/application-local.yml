@@ -4,3 +4,7 @@ spring:
     url: jdbc:mysql://user-db:3306/user_db
     username: root
     password: root
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:sql/init.sql

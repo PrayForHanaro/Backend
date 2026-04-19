@@ -17,8 +17,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
-    name = "GIFT",
-    uniqueConstraints = @UniqueConstraint(name = "uq_gift_sender_receiver", columnNames = {"sender_id", "receiver_id"})
+    name = "Gift",
+    uniqueConstraints = @UniqueConstraint(name = "uq_gift_sender_receiver", columnNames = {"senderId", "receiverId"})
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,59 +27,56 @@ import java.util.List;
 public class Gift extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "giftId")
 	private Long giftId;
 
 	/** 보내는 사람 ID (user_db 참조, FK 없음) */
-	@Column(name = "sender_id", nullable = false)
+	@Column(name = "senderId", nullable = false)
 	private Long senderId;
 
 	/** 받는 사람 ID (user_db 참조, FK 없음). 가입자 한정 (decisions/003) */
-	@Column(name = "receiver_id", nullable = false)
+	@Column(name = "receiverId", nullable = false)
 	private Long receiverId;
 
 	/** 대상자와의 관계 (아들/딸/손주) */
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 20)
+	@Column(name = "giftReceiverType", nullable = false, length = 20)
 	private GiftReceiverType giftReceiverType;
 
-	/** 출금 계좌 ID - 나의 대표 헌금계좌 (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "fromAccountId", nullable = false)
 	private Long fromAccountId;
 
-	/** 입금 계좌 ID - 상대방 적금계좌 (user_db 참조, FK 없음) */
-	@Column(nullable = false)
+	@Column(name = "toSavingsAccountId", nullable = false)
 	private Long toSavingsAccountId;
 
-	/** 매달 자동이체 금액 */
-	@Column(nullable = false)
+	@Column(name = "amount", nullable = false)
 	private BigDecimal amount;
 
 	/** 매달 이체 실행일 (1~31) (BLESS_SPEC §6-4) */
-	@Column(nullable = false)
+	@Column(name = "transferDay", nullable = false)
 	private int transferDay;
 
 	/** 기도 목표 기간 (일). 기본 365 (BLESS_SPEC §10 — 사용자 입력, Mock) */
-	@Column(nullable = false)
+	@Column(name = "goalDays", nullable = false)
 	private int goalDays;
 
 	/** 자동이체 활성화 여부 */
-	@Column(nullable = false)
+	@Column(name = "isActive", nullable = false)
 	private boolean isActive;
 
 	/** 이 시점까지의 누적 송금 총액 (캐싱, SUCCESS 합계로 갱신) */
-	@Column(nullable = false)
+	@Column(name = "cumulativeTotal", nullable = false)
 	private BigDecimal cumulativeTotal;
 
 	/** 가입한 적금 상품 ID. 상품 변경·삭제와 독립적으로 이 Gift의 스냅샷(name·rate)은 유지 */
-	@Column(nullable = false)
+	@Column(name = "savingsProductId", nullable = false)
 	private Long savingsProductId;
 
 	/** 적금 상품 이름 (가입 시점 스냅샷) */
-	@Column(nullable = false)
+	@Column(name = "savingsProductName", nullable = false)
 	private String savingsProductName;
 
-	/** 적금 상품 혜택률 */
-	@Column(nullable = false)
+	@Column(name = "interestRate", nullable = false)
 	private BigDecimal interestRate;
 
 	@OneToMany(mappedBy = "gift", cascade = CascadeType.ALL, orphanRemoval = true)

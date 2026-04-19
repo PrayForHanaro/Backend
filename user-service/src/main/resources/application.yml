@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 spring:
   profiles:
     active: local
@@ -9,8 +6,11 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
+    defer-datasource-initialization: true
     properties:
       hibernate:
         jdbc:
@@ -23,6 +23,7 @@ spring:
   sql:
     init:
       mode: never
+      schema-locations: classpath:sql/init.sql
 feign:
   circuitbreaker:
     enabled: true
@@ -36,5 +37,3 @@ cloud:
       static: ${AWS_REGION}
     s3:
       bucket: ${AWS_S3_BUCKET}
-
-

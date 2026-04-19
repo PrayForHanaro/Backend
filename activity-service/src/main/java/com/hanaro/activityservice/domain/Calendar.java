@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "CALENDAR")
+@Table(name = "Calendar")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -17,27 +17,27 @@ public class Calendar extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long calendarId;
 
-	@Column(nullable = false)
-	private Long userId;        // FK 없음 (user_db)
+	@Column(name = "userId", nullable = false)
+	private Long userId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "activity_id")
-	private Activity activity;  // 같은 DB → FK 정상 (nullable)
+	@JoinColumn(name = "activityId")
+	private Activity activity;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 10)
-	private CalendarType calendarType;    // 개인/교회
+	@Column(name = "calendarType", nullable = false, length = 10)
+	private CalendarType calendarType;
 
-	@Column(nullable = false, length = 20)
+	@Column(name = "title", nullable = false, length = 20)
 	private String title;
 
-	@Column(nullable = false)
+	@Column(name = "startDateTime", nullable = false)
 	private LocalDateTime startDateTime;
 
-	@Column(nullable = false)
+	@Column(name = "endDateTime", nullable = false)
 	private LocalDateTime endDateTime;
 
-	@Column(length = 100)
+	@Column(name = "memo", length = 100)
 	private String memo;
 
 }
