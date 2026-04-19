@@ -81,10 +81,15 @@ public class UserController {
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/me")
-	public ApiResponse<UserMyPageResponseDTO> getMyPage(
-			@AuthenticationPrincipal CustomUserDetails user
-	) {
-		return ApiResponse.ok(userService.getMyPageInfo(user.getUserId()));
+	public ApiResponse getMyPage(@AuthenticationPrincipal CustomUserDetails user) {
+		return ApiResponse.ok(
+				UserMyPageResponseDTO.builder()
+						.name("테스트")
+						.profileUrl(null)
+						.orgName("소속 교회 없음")
+						.pointSum(0)
+						.build()
+		);
 	}
 
 	@PostMapping("/login")
