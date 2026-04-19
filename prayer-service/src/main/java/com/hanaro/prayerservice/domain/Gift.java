@@ -23,7 +23,7 @@ import java.util.List;
 public class Gift extends  BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "giftId", columnDefinition = "int unsigned")
+	@Column(name = "giftId")
 	private Long giftId;
 
 	@Column(name = "senderId", nullable = false)

@@ -2,7 +2,7 @@
 -- 1. Gift
 -- =============================================
 CREATE TABLE IF NOT EXISTS Gift (
-    `giftId`                INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+    `giftId`                BIGINT  NOT NULL AUTO_INCREMENT,
     `senderId`              BIGINT        NOT NULL,
     `receiverId`            BIGINT        NULL,
     `giftReceiverType`     VARCHAR(20)   NOT NULL,
