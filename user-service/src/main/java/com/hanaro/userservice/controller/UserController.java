@@ -89,6 +89,6 @@ public class UserController {
 
 	@PostMapping("/login")
 	public ApiResponse<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
-		return ApiResponse.ok(userService.login(request));
+		return ApiResponse.ok(userService.verify(request));
 	}
 }
