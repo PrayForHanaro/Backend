@@ -25,6 +25,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -67,8 +68,9 @@ public class GiftService {
             throw new PrayerException(PrayerErrorCode.NO_DEFAULT_ACCOUNT);
         }
 
-        // Mock 적금 계좌 ID — BLESS_SPEC §10-11 (실제 은행 계좌 개설은 Mock)
-        long toSavingsAccountId = System.currentTimeMillis();
+        // Mock 적금 계좌 ID — BLESS_SPEC §10-11. 실제 은행 계좌 개설 API 연동 시 이 블록 전체 제거
+        long toSavingsAccountId = ThreadLocalRandom.current()
+                .nextLong(1_000_000_000L, 9_999_999_999L);
 
         Gift gift = Gift.builder()
                 .senderId(senderId)
