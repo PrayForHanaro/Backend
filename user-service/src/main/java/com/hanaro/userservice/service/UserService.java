@@ -1,6 +1,5 @@
 package com.hanaro.userservice.service;
 
-import com.hanaro.common.exception.ErrorCode;
 import com.hanaro.userservice.domain.*;
 import com.hanaro.userservice.dto.request.LoginRequestDTO;
 import com.hanaro.userservice.dto.request.UsePointRequest;
@@ -106,16 +105,16 @@ public class UserService {
 
 
     public LoginResponseDTO verify(LoginRequestDTO request) {
-        User user = userRepository.findByPhone(request.phone())
+        User user = userRepository.findByPhone(request.getPhone())
                 .orElseThrow(() -> new LoginFailException());
 
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             log.error("비번 불일치");
             throw new LoginFailException();
         }
 
         return new LoginResponseDTO(
-                user.getUserId().toString(),
+                user.getUserId(),
                 user.getName(),
                 user.getRole(),
                 user.getOrgId()
