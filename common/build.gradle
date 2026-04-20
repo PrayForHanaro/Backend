@@ -13,6 +13,7 @@ java {
 }
 
 dependencies {
+    api 'org.springframework:spring-context'
     api 'org.springframework:spring-web'
     api 'org.springframework.security:spring-security-core'
     api 'org.springframework.security:spring-security-web'

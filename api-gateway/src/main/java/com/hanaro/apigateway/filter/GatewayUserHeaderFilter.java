@@ -1,6 +1,8 @@
 package com.hanaro.apigateway.filter;
 
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Function;
@@ -15,8 +17,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.function.ServerRequest;
 
+@Component
 @Configuration
 public class GatewayUserHeaderFilter {
 
@@ -99,7 +103,8 @@ public class GatewayUserHeaderFilter {
                 }
 
                 if (finalUserName != null && !finalUserName.isBlank()) {
-                    headers.set(InternalSecurityHeaders.X_AUTH_USER_NAME, finalUserName);
+                    headers.set(InternalSecurityHeaders.X_AUTH_USER_NAME,
+                            URLEncoder.encode(finalUserName, StandardCharsets.UTF_8));
                 }
 
                 if (finalOrgId != null && !finalOrgId.isBlank()) {
