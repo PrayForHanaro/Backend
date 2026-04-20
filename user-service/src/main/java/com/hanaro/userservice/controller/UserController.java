@@ -14,12 +14,14 @@ import com.hanaro.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Tag(name = "유저", description = "유저 정보 핸들링")
 @RestController
 @RequestMapping("/apis/user/users")
@@ -34,6 +36,7 @@ public class UserController {
 	public ApiResponse<UserHomeResponseDTO> getHome(
 			@AuthenticationPrincipal CustomUserDetails user
 	) {
+		log.debug("user: {}", user);
 		return ApiResponse.ok(userService.getHomeInfo(user.getUserId()));
 	}
 

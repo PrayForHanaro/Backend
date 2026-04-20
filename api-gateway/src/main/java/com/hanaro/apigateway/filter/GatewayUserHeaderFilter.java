@@ -1,6 +1,8 @@
 package com.hanaro.apigateway.filter;
 
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Function;
@@ -99,7 +101,8 @@ public class GatewayUserHeaderFilter {
                 }
 
                 if (finalUserName != null && !finalUserName.isBlank()) {
-                    headers.set(InternalSecurityHeaders.X_AUTH_USER_NAME, finalUserName);
+                    headers.set(InternalSecurityHeaders.X_AUTH_USER_NAME,
+                            URLEncoder.encode(finalUserName, StandardCharsets.UTF_8));
                 }
 
                 if (finalOrgId != null && !finalOrgId.isBlank()) {

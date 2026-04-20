@@ -69,3 +69,8 @@ security:
     api-key: ${INTERNAL_API_KEY:activity-service-key}
     valid-api-keys: ${INTERNAL_VALID_API_KEYS:user-service-key,activity-service-key,offering-service-key,prayer-service-key,org-service-key}
 
+downstream:
+  offering-service: ${OFFERING_SERVICE_DOWNSTREAM}
+  prayer-service: ${PRAYER_SERVICE_DOWNSTREAM}
+  user-service: ${USER_SERVICE_DOWNSTREAM}
+  org-service: ${ORG_SERVICE_DOWNSTREAM}
