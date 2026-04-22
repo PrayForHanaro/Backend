@@ -11,16 +11,16 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class OrgConsumer {
-
-    private final OrgService orgService;
-
-    @KafkaListener(topics = "offering-topic", groupId = "org-service-group")
-    public void handleOfferingEvent(OfferingEvent event) {
-        log.info("Received offering event for orgId: {}, amount: {}", event.getOrgId(), event.getAmount());
-        try {
-            orgService.updateOfferingAmount(event.getOrgId(), event.getAmount());
-        } catch (Exception e) {
-            log.error("Failed to update offering amount for orgId: {}", event.getOrgId(), e);
-        }
-    }
+//
+//    private final OrgService orgService;
+//
+//    @KafkaListener(topics = "offering-topic", groupId = "org-service-group")
+//    public void handleOfferingEvent(OfferingEvent event) {
+//        log.info("Received offering event for orgId: {}, amount: {}", event.getOrgId(), event.getAmount());
+//        try {
+//            orgService.updateOfferingAmount(event.getOrgId(), event.getAmount());
+//        } catch (Exception e) {
+//            log.error("Failed to update offering amount for orgId: {}", event.getOrgId(), e);
+//        }
+//    }
 }

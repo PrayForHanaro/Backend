@@ -7,6 +7,7 @@ import com.hanaro.offeringservice.dto.AccountWithdrawRequest;
 import com.hanaro.offeringservice.dto.OfferingRequestDTO;
 import com.hanaro.offeringservice.dto.UsePointRequest;
 import com.hanaro.offeringservice.dto.event.OfferingEvent;
+import com.hanaro.offeringservice.infrastructure.kafka.PointEventPublisher;
 import com.hanaro.offeringservice.repository.OfferingRepository;
 import com.hanaro.common.exception.BaseException;
 import com.hanaro.offeringservice.exception.OfferingErrorCode;
@@ -26,12 +27,12 @@ public class OfferingService {
     private final AccountClient accountClient;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final OfferingTransactionalHelper offeringTransactionalHelper; // 추가
+    private final PointEventPublisher pointEventPublisher;
 
     public Long registerOffering(Long userId, OfferingRequestDTO request) {
-        OfferingType type = getOfferingType(request.getType());
 
         // 1. 로컬 DB 저장 (헌금 기록 먼저 생성)
-        Long offeringId = offeringTransactionalHelper.saveOffering(userId, request, type);
+        Long offeringId = offeringTransactionalHelper.saveOffering(userId, request, request.getOfferingType());
 
         // 2. 외부 서비스 호출 (출금)
         try {
@@ -45,7 +46,7 @@ public class OfferingService {
         // 3. 포인트 차감
         try {
             if (request.getUsedPoint() != null && request.getUsedPoint().intValue() > 0) {
-                userClient.usePoint(userId, new UsePointRequest(request.getUsedPoint().intValue()));
+                userClient.usePoint(new UsePointRequest(request.getUsedPoint().intValue()));
             }
         } catch (Exception e) {
             // [보상 조치] DB 기록 삭제 + 출금 취소
@@ -62,17 +63,7 @@ public class OfferingService {
         }
 
         // 4. Kafka 이벤트 발행
-        kafkaTemplate.send("offering-topic", OfferingEvent.builder()
-                        .userId(userId)
-                        .orgId(request.getOrgId())
-                        .accountId(request.getAccountId())
-                        .amount(request.getAmount())
-                        .usedPoint(request.getUsedPoint() != null ? request.getUsedPoint().intValue() : 0)
-                        .offeringType(type.name())
-                        .build())
-                .whenComplete((result, ex) -> {
-                    if (ex != null) log.error("보상 이벤트 전송 실패: {}", ex.getMessage());
-                });
+        pointEventPublisher.publishOfferingOnce(userId, request.getAmount(), request.getOfferingType());
 
         return offeringId;
     }

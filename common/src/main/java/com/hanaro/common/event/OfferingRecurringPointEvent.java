@@ -1,0 +1,20 @@
+package com.hanaro.common.event;
+
+import com.hanaro.common.domain.OfferingType;
+import com.hanaro.common.domain.PointType;
+import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OfferingRecurringPointEvent {
+  private Long userId;
+  private PointType pointType;
+  BigDecimal donationAmount;
+  OfferingType offeringType;
+}

@@ -1,6 +1,7 @@
 package com.hanaro.userservice.domain;
 
 import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
+import com.hanaro.common.domain.OfferingType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -57,12 +58,21 @@ public class Point extends BaseEntity {
 	//6. SAVINGS_RECURRING: "적금자동이체: {대상이름}"
 
 	//kafka
-	public static Point createOfferingOnce(User user, Double donationRate, long donationAmount, String offeringType) {
+	public static Point createOfferingOnce(User user, Double donationRate, long donationAmount, OfferingType offeringType) {
 		return Point.builder()
 				.user(user)
 				.pointType(PointType.OFFERING_ONCE)
 				.amount((int)Math.ceil(donationAmount * donationRate))
 				.info("헌금 - 포인트 적립: " + offeringType)
+				.build();
+	}
+
+	public static Point createOfferingRecurring(User user, Double donationRate, long donationAmount, OfferingType offeringType) {
+		return Point.builder()
+				.user(user)
+				.pointType(PointType.OFFERING_RECURRING)
+				.amount((int)Math.ceil(donationAmount * donationRate))
+				.info("정기헌금 - 포인트 적립: " + offeringType)
 				.build();
 	}
 
@@ -93,11 +103,11 @@ public class Point extends BaseEntity {
 				.build();
 	}
 
-	public static Point createSavingsRecurring(User user, String targetName) {
+	public static Point createSavingsRecurring(User user, String targetName, int amount) {
 		return Point.builder()
 				.user(user)
 				.pointType(PointType.SAVINGS_RECURRING)
-				.amount(100)
+				.amount(amount)
 				.info("적금기도: " + targetName)
 				.build();
 	}

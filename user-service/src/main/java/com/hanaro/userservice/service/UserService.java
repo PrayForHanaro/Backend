@@ -1,10 +1,14 @@
 package com.hanaro.userservice.service;
 
+import com.hanaro.common.event.ActivityChurchPointEvent;
+import com.hanaro.common.event.ActivityVolunteerPointEvent;
+import com.hanaro.common.event.OfferingOncePointEvent;
+import com.hanaro.common.event.OfferingRecurringPointEvent;
+import com.hanaro.common.event.SavingsJoinPointEvent;
+import com.hanaro.common.event.SavingsRecurringPointEvent;
 import com.hanaro.userservice.domain.*;
 import com.hanaro.userservice.dto.request.UsePointRequest;
 import com.hanaro.userservice.client.OrgClient;
-import com.hanaro.userservice.domain.PointType;
-import com.hanaro.userservice.dto.event.PointEvent;
 import com.hanaro.userservice.dto.request.SignUpRequestDTO;
 import com.hanaro.userservice.dto.response.OrgMyPageResponseDTO;
 import com.hanaro.userservice.dto.response.UserGivingResponseDTO;
@@ -14,7 +18,6 @@ import com.hanaro.userservice.dto.response.UserSimpleResponseDTO;
 import com.hanaro.userservice.mapper.UserMapper;
 import com.hanaro.userservice.repository.PointRepository;
 import com.hanaro.userservice.repository.UserRepository;
-import com.hanaro.common.storage.StorageService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +39,7 @@ public class UserService {
     @Transactional
     public void signUp(SignUpRequestDTO request) {
 
-        if (userRepository.existsByPhone(request.getPhoneNumber())) {
+        if (userRepository.existsByPhone(request.getPhone())) {
           throw new IllegalArgumentException("이미 가입된 번호입니다.");
         }
 
@@ -46,7 +49,7 @@ public class UserService {
         User user = User.builder()
             .name(request.getName())
             .birthDate(request.getBirth())
-            .phone(request.getPhoneNumber())
+            .phone(request.getPhone())
             .password(encodedPassword)
             .build();
 
@@ -75,11 +78,7 @@ public class UserService {
       User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
       OrgMyPageResponseDTO orgDto = orgClient.getOrg();
 
-      UserMyPageResponseDTO dto = UserMyPageResponseDTO.of(user, orgDto);
-      if (user.getProfileUrl() != null) {
-          dto.setProfileUrl(storageService.getPresignedUrl(user.getProfileUrl()));
-      }
-      return dto;
+      return UserMyPageResponseDTO.of(user, orgDto);
     }
 
   @Transactional
@@ -90,60 +89,108 @@ public class UserService {
         pointRepository.save(point);
     }
 
-    public int getPointSum(Long userId){
-        User user = userRepository.findById(userId).orElseThrow();
-        return user.getPointSum();
-    }
-
-    @Transactional
-    public void updateProfileImage(Long userId, String profileUrl) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        user.updateProfileUrl(profileUrl);
-    }
-
-
-    //카프카 처리
-  @Transactional
-  public void processPoint(PointEvent event) {
-
-    User user = userRepository.findById(event.getUserId())
-        .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
-
-    Point point;
-
-    switch (PointType.valueOf(event.getPointType())) {
-
-      case OFFERING_ONCE -> point =
-          Point.createOfferingOnce(
-              user,
-              user.getDonationRate(),
-              event.getAmount(),
-              event.getTitle()
-          );
-
-      case ACTIVITY_VOLUNTEER -> point =
-          Point.createActivityVolunteer(user, event.getTitle());
-
-      case ACTIVITY_CHURCH -> point =
-          Point.createActivityChurch(user, event.getTitle());
-
-      case SAVINGS_JOIN -> point =
-          Point.createSavingsJoin(
-              user,
-              event.getProductName(),
-              event.getTargetName()
-          );
-
-      case SAVINGS_RECURRING -> point =
-          Point.createSavingsRecurring(user, event.getTargetName());
-
-      default -> throw new IllegalArgumentException("지원하지 않는 타입");
-    }
-
-    pointRepository.save(point);
-
-    user.addPoint(point.getAmount());
+  public int getPointSum(Long userId){
+      User user = userRepository.findById(userId).orElseThrow();
+      return user.getPointSum();
   }
 
+  @Transactional
+  public void updateProfileImage(Long userId, String profileUrl) {
+      User user = userRepository.findById(userId)
+              .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+      user.updateProfileUrl(profileUrl);
+  }
+  @Transactional
+  public void processOfferingOnce(OfferingOncePointEvent event) {
+
+    User user = findUser(event.getUserId());
+
+    Point point = Point.createOfferingOnce(
+        user,
+        user.getDonationRate(),
+        event.getDonationAmount().longValue(),
+        event.getOfferingType()
+    );
+
+    savePoint(user, point);
+  }
+
+  @Transactional
+  public void processOfferingRecurring(OfferingRecurringPointEvent event) {
+
+    User user = findUser(event.getUserId());
+
+    Point point = Point.builder()
+        .user(user)
+        .pointType(PointType.OFFERING_RECURRING)
+        .amount(500)
+        .info("정기헌금 등록")
+        .build();
+
+    savePoint(user, point);
+  }
+
+  @Transactional
+  public void processActivityChurch(ActivityChurchPointEvent event) {
+
+    User user = findUser(event.getUserId());
+
+    Point point = Point.createActivityChurch(
+        user,
+        event.getTitle()
+    );
+
+    savePoint(user, point);
+  }
+
+  @Transactional
+  public void processActivityVolunteer(ActivityVolunteerPointEvent event) {
+
+    User user = findUser(event.getUserId());
+
+    Point point = Point.createActivityVolunteer(
+        user,
+        event.getTitle()
+    );
+
+    savePoint(user, point);
+  }
+
+  @Transactional
+  public void processSavingsJoin(SavingsJoinPointEvent event) {
+
+    User user = findUser(event.getUserId());
+
+    Point point = Point.createSavingsJoin(
+        user,
+        event.getProductName(),
+        event.getTargetName()
+    );
+
+    savePoint(user, point);
+  }
+
+  @Transactional
+  public void processSavingsRecurring(SavingsRecurringPointEvent event) {
+
+    User user = findUser(event.getUserId());
+
+    Point point = Point.createSavingsRecurring(
+        user,
+        event.getTargetName(),
+        event.getPointAmount()
+    );
+
+    savePoint(user, point);
+  }
+
+  private User findUser(Long userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+  }
+
+  private void savePoint(User user, Point point) {
+    pointRepository.save(point);
+    user.addPoint(point.getAmount());
+  }
 }

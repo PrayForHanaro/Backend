@@ -4,22 +4,19 @@ import com.hanaro.prayerservice.client.user.UserClient;
 import com.hanaro.prayerservice.client.user.dto.WithdrawRequest;
 import com.hanaro.prayerservice.domain.Gift;
 import com.hanaro.prayerservice.domain.GiftTransfer;
-import com.hanaro.prayerservice.domain.PointType;
 import com.hanaro.prayerservice.domain.TransferStatus;
-import com.hanaro.prayerservice.event.PointEarnEvent;
+import com.hanaro.prayerservice.infrastructure.kafka.PointEventPublisher;
 import com.hanaro.prayerservice.repository.GiftRepository;
 import com.hanaro.prayerservice.repository.GiftTransferRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
 import java.time.LocalDate;
 
 @Slf4j
@@ -33,7 +30,7 @@ public class AutoTransferProcessor {
     private final GiftRepository giftRepository;
     private final GiftTransferRepository giftTransferRepository;
     private final UserClient userClient;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final PointEventPublisher pointEventPublisher;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processOne(Long giftId, LocalDate date) {
@@ -66,17 +63,12 @@ public class AutoTransferProcessor {
 
         if (status == TransferStatus.SUCCESS) {
             gift.addCumulativeTotal(amount);
-            long earnedPoint = amount.multiply(RECURRING_POINT_RATE)
+            int earnedPoint = amount.multiply(RECURRING_POINT_RATE)
                     .setScale(0, RoundingMode.FLOOR)
-                    .longValue();
-            applicationEventPublisher.publishEvent(PointEarnEvent.builder()
-                    .userId(gift.getSenderId())
-                    .pointType(PointType.SAVINGS_RECURRING)
-                    .amount(earnedPoint)
-                    .refId(savedTransfer.getTransferId())
-                    .info("기도적금 자동이체: " + gift.getSavingsProductName())
-                    .timestamp(Instant.now())
-                    .build());
+                    .intValue();
+
+            pointEventPublisher.publishSavingRecurringPoint(gift.getSenderId(), gift.getSavingsProductName(), earnedPoint);
+
             log.info("[AutoTransfer] SUCCESS giftId={} amount={} earnedPoint={}",
                     giftId, amount, earnedPoint);
         } else {

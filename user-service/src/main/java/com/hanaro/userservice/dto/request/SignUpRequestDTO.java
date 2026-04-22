@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class SignUpRequestDTO {
   private String name;
   private LocalDate birth;       // yyyy-MM-dd 추천
-  private String phoneNumber;
+  private String phone;
   private String password;
 }

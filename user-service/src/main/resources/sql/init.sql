@@ -37,9 +37,10 @@ CREATE TABLE IF NOT EXISTS Account (
     CONSTRAINT fk_account_user FOREIGN KEY (`userId`) REFERENCES User (`userId`)
 );
 
-ALTER TABLE User
-    ADD CONSTRAINT fk_user_default_account FOREIGN KEY (`defaultAccountId`) REFERENCES Account (`accountId`);
-
+SET @sql := IF(@fk_exists = 0,
+    'ALTER TABLE `User` ADD CONSTRAINT fk_user_default_account FOREIGN KEY (`defaultAccountId`) REFERENCES `Account` (`accountId`)',
+    'SELECT "FK already exists"'
+);
 -- =============================================
 -- 3. Point (포인트 이력)
 -- =============================================

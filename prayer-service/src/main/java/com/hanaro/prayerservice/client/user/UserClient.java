@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 )
 public interface UserClient {
 
-    @GetMapping("/apis/user/users/me/givingOnce")
+    @GetMapping("/internal/users/me/givingOnce")
     ApiResponse<UserGivingResponse> getGivingInfo();
 
     @PostMapping("/internal/accounts/{accountId}/withdraw")

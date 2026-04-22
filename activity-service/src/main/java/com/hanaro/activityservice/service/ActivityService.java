@@ -9,6 +9,7 @@ import com.hanaro.activityservice.domain.DayOfWeekType;
 import com.hanaro.activityservice.domain.RecurrenceType;
 import com.hanaro.activityservice.dto.request.ActivityRequest;
 import com.hanaro.activityservice.dto.response.ActivityResponse;
+import com.hanaro.activityservice.kafka.PointEventPublisher;
 import com.hanaro.activityservice.repository.ActivityApplyRepository;
 import com.hanaro.activityservice.repository.ActivityRepository;
 import com.hanaro.common.storage.StorageService;
@@ -47,6 +48,7 @@ public class ActivityService {
     private final ActivityRepository activityRepository;
     private final ActivityApplyRepository activityApplyRepository;
     private final StorageService storageService;
+    private final PointEventPublisher pointEventPublisher;
 
     private static final int MAX_IMAGE_COUNT = 3;
 
@@ -184,6 +186,15 @@ public class ActivityService {
 
         activity.getApplies().add(apply);
         activityApplyRepository.save(apply);
+
+        switch (activity.getActivityCategory()) {
+
+            case 교회행사 ->
+                pointEventPublisher.publishActivityChurch(userId, activity.getTitle());
+
+            case 봉사모집 ->
+                pointEventPublisher.publishActivityVolunteer(userId, activity.getTitle());
+        }
 
         if (getCurrentCount(activity) >= activity.getMaxMembers()) {
             activity.close();

@@ -1,9 +1,9 @@
 package com.hanaro.offeringservice.domain;
 
+import com.hanaro.common.domain.OfferingType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
  * 헌금 내역

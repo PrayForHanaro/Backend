@@ -1,0 +1,11 @@
+package com.hanaro.common.domain;
+
+public enum PointType {
+  OFFERING_ONCE,
+  OFFERING_RECURRING,
+  ACTIVITY_VOLUNTEER,
+  ACTIVITY_CHURCH,
+  SAVINGS_JOIN,
+  SAVINGS_RECURRING,
+  USING_POINT,
+}

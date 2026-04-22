@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
 	private final UserService userService;
+	private final StorageService storageService;
 
 	@GetMapping("/me/home")
 	public ApiResponse<UserHomeResponseDTO> getHome(@AuthenticationPrincipal CustomUserDetails user) {
@@ -52,7 +53,6 @@ public class UserController {
 
   //로그아웃
 
-	//이미지 수정 - presignedUrl 발급해주기
 	//이미지 수정 - 수정한 url 저장
 	@PostMapping("/profile-image")
 	public ApiResponse<String> uploadProfileImage(
@@ -75,5 +75,4 @@ public class UserController {
 	) {
 		return ApiResponse.ok(userService.getMyPageInfo(user.getUserId()));
 	}
-
 }

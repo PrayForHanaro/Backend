@@ -1,7 +1,7 @@
 package com.hanaro.offeringservice.service;
 
+import com.hanaro.common.domain.OfferingType;
 import com.hanaro.offeringservice.domain.Offering;
-import com.hanaro.offeringservice.domain.OfferingType;
 import com.hanaro.offeringservice.dto.OfferingRequestDTO;
 import com.hanaro.offeringservice.repository.OfferingRepository;
 import lombok.RequiredArgsConstructor;

@@ -3,23 +3,20 @@ package com.hanaro.prayerservice.service;
 import com.hanaro.prayerservice.client.user.UserClient;
 import com.hanaro.prayerservice.client.user.dto.UserGivingResponse;
 import com.hanaro.prayerservice.domain.Gift;
-import com.hanaro.prayerservice.domain.PointType;
 import com.hanaro.prayerservice.domain.SavingsProduct;
 import com.hanaro.prayerservice.dto.GiftReceiverResponse;
 import com.hanaro.prayerservice.dto.SavingsJoinRequest;
 import com.hanaro.prayerservice.dto.SavingsJoinResponse;
-import com.hanaro.prayerservice.event.PointEarnEvent;
 import com.hanaro.prayerservice.exception.PrayerErrorCode;
 import com.hanaro.prayerservice.exception.PrayerException;
+import com.hanaro.prayerservice.infrastructure.kafka.PointEventPublisher;
 import com.hanaro.prayerservice.repository.GiftRepository;
 import com.hanaro.prayerservice.repository.SavingsProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -37,7 +34,7 @@ public class GiftService {
     private final GiftRepository giftRepository;
     private final SavingsProductRepository savingsProductRepository;
     private final UserClient userClient;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final PointEventPublisher pointEventPublisher;
 
     public List<GiftReceiverResponse> getMyReceivers(Long userId) {
         LocalDate today = LocalDate.now(KST);
@@ -88,14 +85,7 @@ public class GiftService {
                 .build();
         Gift saved = giftRepository.save(gift);
 
-        applicationEventPublisher.publishEvent(PointEarnEvent.builder()
-                .userId(senderId)
-                .pointType(PointType.SAVINGS_JOIN)
-                .amount(SAVINGS_JOIN_POINT)
-                .refId(saved.getGiftId())
-                .info("적금가입: " + product.getName())
-                .timestamp(Instant.now())
-                .build());
+        pointEventPublisher.publishSavingJoinPoint(senderId,product.getName(),request.getGiftReceiverType().toString());
 
         return SavingsJoinResponse.builder()
                 .giftId(saved.getGiftId())
